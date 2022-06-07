@@ -38,6 +38,8 @@ SIZE SizeOfText2;
 SIZE SizeOfText3;
 SIZE SizeOfText4;
 
+COLORREF GreenColor = 0x0000FF00;
+
 int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, int CommandShow) {
     WNDCLASSEXA WindowClass = {0};
 
@@ -157,14 +159,23 @@ LRESULT CALLBACK WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM 
             PAINTSTRUCT PaintStruct;
 
             HDC DeviceContextHandle = BeginPaint(WindowHandle, &PaintStruct);
-
+            
             SelectObject(DeviceContextHandle, WindowDrawFont);
+
+            HBRUSH GreenBrush = CreateSolidBrush(GreenColor);
+
+            FillRect(DeviceContextHandle, &TextRect1, GreenBrush);
+            FillRect(DeviceContextHandle, &TextRect2, GreenBrush);
+            FillRect(DeviceContextHandle, &TextRect3, GreenBrush);
+            FillRect(DeviceContextHandle, &TextRect4, GreenBrush);
+            
+            SetBkMode(DeviceContextHandle, TRANSPARENT);
 
             DrawTextA(DeviceContextHandle, ToBeDisplayedText1, -1, &TextRect1, DT_LEFT | DT_NOPREFIX);
             DrawTextA(DeviceContextHandle, ToBeDisplayedText2, -1, &TextRect2, DT_LEFT | DT_NOPREFIX);
             DrawTextA(DeviceContextHandle, ToBeDisplayedText3, -1, &TextRect3, DT_LEFT | DT_NOPREFIX);
             DrawTextA(DeviceContextHandle, ToBeDisplayedText4, -1, &TextRect4, DT_LEFT | DT_NOPREFIX);
-
+            
             EndPaint(WindowHandle, &PaintStruct);
 
             break;
