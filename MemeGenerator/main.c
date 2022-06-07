@@ -8,6 +8,9 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 int IsLeftClicked = 0;
 int IsInsideTextRect1 = 0;
+int IsInsideTextRect2 = 0;
+int IsInsideTextRect3 = 0;
+int IsInsideTextRect4 = 0;
 
 int MouseXPos;
 int MouseYPos;
@@ -31,6 +34,9 @@ RECT TextRect3;
 RECT TextRect4;
 
 SIZE SizeOfText1;
+SIZE SizeOfText2;
+SIZE SizeOfText3;
+SIZE SizeOfText4;
 
 int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, int CommandShow) {
     WNDCLASSEXA WindowClass = {0};
@@ -118,29 +124,31 @@ LRESULT CALLBACK WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM 
                 SelectObject(DeviceContextHandle, WindowDrawFont);
 
                 GetTextExtentPoint32A(DeviceContextHandle, ToBeDisplayedText1, strlen(ToBeDisplayedText1), &SizeOfText1);
+                GetTextExtentPoint32A(DeviceContextHandle, ToBeDisplayedText2, strlen(ToBeDisplayedText2), &SizeOfText2);
+                GetTextExtentPoint32A(DeviceContextHandle, ToBeDisplayedText3, strlen(ToBeDisplayedText3), &SizeOfText3);
+                GetTextExtentPoint32A(DeviceContextHandle, ToBeDisplayedText4, strlen(ToBeDisplayedText4), &SizeOfText4);
+
                 ReleaseDC(WindowHandle, DeviceContextHandle);
 
                 TextRect1.left = 350;
                 TextRect1.top = 50;
                 TextRect1.right = TextRect1.left + SizeOfText1.cx;
                 TextRect1.bottom = TextRect1.top + SizeOfText1.cy;
-                // TextRect1.right = 800;
-                // TextRect1.bottom = 450;
-
+                
                 TextRect2.left = 600;
                 TextRect2.top = 50;
-                TextRect2.right = 800;
-                TextRect2.bottom = 450;
+                TextRect2.right = TextRect2.left + SizeOfText2.cx;
+                TextRect2.bottom = TextRect2.top + SizeOfText2.cy;
 
                 TextRect3.left = 350;
                 TextRect3.top = 200;
-                TextRect3.right = 800;
-                TextRect3.bottom = 450;
+                TextRect3.right = TextRect3.left + SizeOfText3.cx;
+                TextRect3.bottom = TextRect3.top + SizeOfText3.cy;
 
                 TextRect4.left = 600;
                 TextRect4.top = 200;
-                TextRect4.right = 800;
-                TextRect4.bottom = 450;
+                TextRect4.right = TextRect4.left + SizeOfText4.cx;
+                TextRect4.bottom = TextRect4.top + SizeOfText4.cy;
             }
 
             break;
@@ -170,12 +178,18 @@ LRESULT CALLBACK WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM 
             POINT MouseLocation = {MouseXPos, MouseYPos};
 
             IsInsideTextRect1 = PtInRect(&TextRect1, MouseLocation);
+            IsInsideTextRect2 = PtInRect(&TextRect2, MouseLocation);
+            IsInsideTextRect3 = PtInRect(&TextRect3, MouseLocation);
+            IsInsideTextRect4 = PtInRect(&TextRect4, MouseLocation);
             
             break;
 
         case WM_LBUTTONUP:
             IsLeftClicked = 0;
             IsInsideTextRect1 = 0;
+            IsInsideTextRect2 = 0;
+            IsInsideTextRect3 = 0;
+            IsInsideTextRect4 = 0;
             
             break;
 
@@ -187,6 +201,33 @@ LRESULT CALLBACK WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM 
                 int NewMouseYPos = GET_Y_LPARAM(LParam);
 
                 OffsetRect(&TextRect1, NewMouseXPos - MouseXPos, NewMouseYPos - MouseYPos);
+                InvalidateRect(WindowHandle, 0, 1);
+
+                MouseXPos = NewMouseXPos;
+                MouseYPos = NewMouseYPos;
+            } else if(IsLeftClicked && IsInsideTextRect2) {
+                int NewMouseXPos = GET_X_LPARAM(LParam);
+                int NewMouseYPos = GET_Y_LPARAM(LParam);
+
+                OffsetRect(&TextRect2, NewMouseXPos - MouseXPos, NewMouseYPos - MouseYPos);
+                InvalidateRect(WindowHandle, 0, 1);
+
+                MouseXPos = NewMouseXPos;
+                MouseYPos = NewMouseYPos;
+            } else if(IsLeftClicked && IsInsideTextRect3) {
+                int NewMouseXPos = GET_X_LPARAM(LParam);
+                int NewMouseYPos = GET_Y_LPARAM(LParam);
+
+                OffsetRect(&TextRect3, NewMouseXPos - MouseXPos, NewMouseYPos - MouseYPos);
+                InvalidateRect(WindowHandle, 0, 1);
+
+                MouseXPos = NewMouseXPos;
+                MouseYPos = NewMouseYPos;
+            } else if(IsLeftClicked && IsInsideTextRect4) {
+                int NewMouseXPos = GET_X_LPARAM(LParam);
+                int NewMouseYPos = GET_Y_LPARAM(LParam);
+
+                OffsetRect(&TextRect4, NewMouseXPos - MouseXPos, NewMouseYPos - MouseYPos);
                 InvalidateRect(WindowHandle, 0, 1);
 
                 MouseXPos = NewMouseXPos;
