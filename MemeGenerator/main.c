@@ -38,6 +38,9 @@ SIZE SizeOfText2;
 SIZE SizeOfText3;
 SIZE SizeOfText4;
 
+HBITMAP ImageHandle;
+BITMAP ImageHandleInfo;
+
 COLORREF GreenColor = 0x0000FF00;
 
 int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, int CommandShow) {
@@ -80,6 +83,9 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     SendMessage(TextField4, WM_SETFONT, (WPARAM)WindowControlFont, 1);
 
     SendMessage(DisplayTextButton, WM_SETFONT, (WPARAM)WindowControlFont, 1);
+
+    ImageHandle = (HBITMAP)LoadImageA(0, "C:\\Users\\ankur\\Desktop\\meme-generator\\MemeGenerator\\sample.bmp", 0, 0, 0, LR_LOADFROMFILE);
+    GetObject(ImageHandle, sizeof(BITMAP), &ImageHandleInfo);
 
     ShowWindow(WindowHandle, CommandShow);
     UpdateWindow(WindowHandle);
@@ -159,6 +165,14 @@ LRESULT CALLBACK WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM 
             PAINTSTRUCT PaintStruct;
 
             HDC DeviceContextHandle = BeginPaint(WindowHandle, &PaintStruct);
+
+            HDC DeviceContextHandleImage = CreateCompatibleDC(DeviceContextHandle);
+
+            SelectObject(DeviceContextHandleImage, ImageHandle);
+
+            int DestWidth = 300;
+
+            StretchBlt(DeviceContextHandle, 400, 50, DestWidth, (DestWidth * ImageHandleInfo.bmHeight) / ImageHandleInfo.bmWidth, DeviceContextHandleImage, 0, 0, ImageHandleInfo.bmWidth, ImageHandleInfo.bmHeight, SRCCOPY);
             
             SelectObject(DeviceContextHandle, WindowDrawFont);
 
