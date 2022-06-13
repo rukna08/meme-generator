@@ -4,7 +4,7 @@
  
 #define BUTTON_DISPLAYTEXT 69
  
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
  
 int IsLeftClicked = 0;
 int IsInsideTextRect1 = 0;
@@ -50,7 +50,7 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     WNDCLASSEXA WindowClass = {0};
  
     WindowClass.cbSize = sizeof(WNDCLASSEXA);
-    WindowClass.lpfnWndProc = WndProc;
+    WindowClass.lpfnWndProc = WindowProc;
     WindowClass.hInstance = Instance;
     WindowClass.hIcon = LoadIconA(0, IDI_APPLICATION);
     WindowClass.hCursor = LoadCursorA(0, IDC_ARROW);
@@ -111,7 +111,7 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     return 0;
 }
  
-LRESULT CALLBACK WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam) {
+LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam) {
     
     switch(Message) {
         case WM_CLOSE:
