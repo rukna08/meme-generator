@@ -34,7 +34,9 @@ RECT TextRect1;
 RECT TextRect2;
 RECT TextRect3;
 RECT TextRect4;
- 
+
+RECT ImageRect1;
+
 SIZE SizeOfText1;
 SIZE SizeOfText2;
 SIZE SizeOfText3;
@@ -171,9 +173,14 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             HDC DeviceContextHandle = BeginPaint(WindowHandle, &PaintStruct);
  
             int DestWidth = 200;
+
+            ImageRect1.left = 400;
+            ImageRect1.top = 50;
+            ImageRect1.right = ImageRect1.left + DestWidth;
+            ImageRect1.bottom = ImageRect1.top + ((DestWidth * ImageHandleInfo.bmHeight) / ImageHandleInfo.bmWidth);
  
             SetStretchBltMode(DeviceContextHandle, HALFTONE);
-            StretchBlt(DeviceContextHandle, 400, 50, DestWidth, (DestWidth * ImageHandleInfo.bmHeight) / ImageHandleInfo.bmWidth, DeviceContextHandleImage, 0, 0, ImageHandleInfo.bmWidth, ImageHandleInfo.bmHeight, SRCCOPY);
+            StretchBlt(DeviceContextHandle, ImageRect1.left, ImageRect1.top, ImageRect1.right - ImageRect1.left, ImageRect1.bottom - ImageRect1.top, DeviceContextHandleImage, 0, 0, ImageHandleInfo.bmWidth, ImageHandleInfo.bmHeight, SRCCOPY);
             
             SelectObject(DeviceContextHandle, WindowDrawFont);
  
@@ -181,6 +188,7 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             FillRect(DeviceContextHandle, &TextRect2, GreenBrush);
             FillRect(DeviceContextHandle, &TextRect3, GreenBrush);
             FillRect(DeviceContextHandle, &TextRect4, GreenBrush);
+            //FillRect(DeviceContextHandle, &ImageRect1, GreenBrush);
             
             SetBkMode(DeviceContextHandle, TRANSPARENT);
  

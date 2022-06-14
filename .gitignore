@@ -2,3 +2,4 @@ MemeGenerator/build/*.exe
 MemeGenerator/build/*.ilk
 MemeGenerator/build/*.obj
 MemeGenerator/build/*.pdb
+MemeGenerator/build/.vs
