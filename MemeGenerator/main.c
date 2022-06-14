@@ -12,6 +12,8 @@ int IsInsideTextRect2 = 0;
 int IsInsideTextRect3 = 0;
 int IsInsideTextRect4 = 0;
 
+int IsCursorTouchingTopRightCorner = 0;
+
 int IsInsideImageRect1 = 0;
  
 int MouseXPos;
@@ -236,6 +238,16 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
  
         case WM_MOUSEMOVE:
             // dragging code
+
+            IsCursorTouchingTopRightCorner = (GET_X_LPARAM(LParam) == ImageRect1.right) &&
+                                             (GET_Y_LPARAM(LParam) == ImageRect1.top);
+            
+            POINT MouseLocation2 = {GET_X_LPARAM(LParam), GET_Y_LPARAM(LParam)};
+            int IsInsideImageRectForCursor = PtInRect(&ImageRect1, MouseLocation2);
+
+            if(IsInsideImageRectForCursor) {
+                SetCursor(LoadCursorA(0, IDC_SIZENESW));
+            }
 
             if(IsLeftClicked && IsInsideTextRect1) {
                 int NewMouseXPos = GET_X_LPARAM(LParam);
