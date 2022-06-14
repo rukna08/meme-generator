@@ -11,6 +11,8 @@ int IsInsideTextRect1 = 0;
 int IsInsideTextRect2 = 0;
 int IsInsideTextRect3 = 0;
 int IsInsideTextRect4 = 0;
+
+int IsInsideImageRect1 = 0;
  
 int MouseXPos;
 int MouseYPos;
@@ -81,6 +83,9 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     NonClientMetrics.lfMessageFont.lfHeight = 100;
     
     WindowDrawFont = CreateFontIndirectA(&NonClientMetrics.lfMessageFont);
+    
+    ImageRect1.left = 400;
+    ImageRect1.top = 50;
  
     SendMessage(TextField1, WM_SETFONT, (WPARAM)WindowControlFont, 1);
     SendMessage(TextField2, WM_SETFONT, (WPARAM)WindowControlFont, 1);
@@ -174,8 +179,6 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
  
             int DestWidth = 200;
 
-            ImageRect1.left = 400;
-            ImageRect1.top = 50;
             ImageRect1.right = ImageRect1.left + DestWidth;
             ImageRect1.bottom = ImageRect1.top + ((DestWidth * ImageHandleInfo.bmHeight) / ImageHandleInfo.bmWidth);
  
@@ -213,6 +216,10 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             IsInsideTextRect2 = PtInRect(&TextRect2, MouseLocation);
             IsInsideTextRect3 = PtInRect(&TextRect3, MouseLocation);
             IsInsideTextRect4 = PtInRect(&TextRect4, MouseLocation);
+
+            IsInsideImageRect1 = PtInRect(&ImageRect1, MouseLocation);
+
+            if(IsInsideImageRect1) OutputDebugStringA("Clicked inside image rect 1\n");
             
             break;
  
@@ -222,13 +229,26 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             IsInsideTextRect2 = 0;
             IsInsideTextRect3 = 0;
             IsInsideTextRect4 = 0;
+
+            IsInsideImageRect1 = 0;
             
             break;
  
         case WM_MOUSEMOVE:
             // dragging code
-            
-            if(IsLeftClicked && IsInsideTextRect1) {
+
+            if(IsLeftClicked && IsInsideImageRect1) {
+                int NewMouseXPos = GET_X_LPARAM(LParam);
+                int NewMouseYPos = GET_Y_LPARAM(LParam);
+                RECT UpdateRect = ImageRect1;
+ 
+                OffsetRect(&ImageRect1, NewMouseXPos - MouseXPos, NewMouseYPos - MouseYPos);
+                UnionRect(&UpdateRect, &UpdateRect, &ImageRect1);
+                InvalidateRect(WindowHandle, &UpdateRect, 1);
+ 
+                MouseXPos = NewMouseXPos;
+                MouseYPos = NewMouseYPos;
+            } else if(IsLeftClicked && IsInsideTextRect1) {
                 int NewMouseXPos = GET_X_LPARAM(LParam);
                 int NewMouseYPos = GET_Y_LPARAM(LParam);
                 RECT UpdateRect = TextRect1;
