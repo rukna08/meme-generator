@@ -12,8 +12,6 @@ int IsInsideTextRect2 = 0;
 int IsInsideTextRect3 = 0;
 int IsInsideTextRect4 = 0;
 
-int IsCursorTouchingTopRightCorner = 0;
-
 int IsInsideImageRect1 = 0;
  
 int MouseXPos;
@@ -40,6 +38,7 @@ RECT TextRect3;
 RECT TextRect4;
 
 RECT ImageRect1;
+RECT ImageRect1TopRight;
 
 SIZE SizeOfText1;
 SIZE SizeOfText2;
@@ -88,6 +87,11 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     
     ImageRect1.left = 400;
     ImageRect1.top = 50;
+
+    ImageRect1TopRight.left = 0;
+    ImageRect1TopRight.top = 0;
+    ImageRect1TopRight.right = 0;
+    ImageRect1TopRight.bottom = 0;
  
     SendMessage(TextField1, WM_SETFONT, (WPARAM)WindowControlFont, 1);
     SendMessage(TextField2, WM_SETFONT, (WPARAM)WindowControlFont, 1);
@@ -238,15 +242,13 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
  
         case WM_MOUSEMOVE:
             // dragging code
-
-            IsCursorTouchingTopRightCorner = (GET_X_LPARAM(LParam) == ImageRect1.right) &&
-                                             (GET_Y_LPARAM(LParam) == ImageRect1.top);
             
             POINT MouseLocation2 = {GET_X_LPARAM(LParam), GET_Y_LPARAM(LParam)};
-            int IsInsideImageRectForCursor = PtInRect(&ImageRect1, MouseLocation2);
+            int IsInsideImageRect1ForDisplayAllArrow = PtInRect(&ImageRect1, MouseLocation2);
+            
 
-            if(IsInsideImageRectForCursor) {
-                SetCursor(LoadCursorA(0, IDC_SIZENESW));
+            if(IsInsideImageRect1ForDisplayAllArrow) {
+                SetCursor(LoadCursorA(0, IDC_SIZEALL));
             }
 
             if(IsLeftClicked && IsInsideTextRect1) {
