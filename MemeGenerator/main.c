@@ -187,6 +187,11 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
 
             ImageRect1.right = ImageRect1.left + DestWidth;
             ImageRect1.bottom = ImageRect1.top + ((DestWidth * ImageHandleInfo.bmHeight) / ImageHandleInfo.bmWidth);
+
+            ImageRect1TopRight.left = ImageRect1.right - 10;
+            ImageRect1TopRight.top = ImageRect1.top + 10;
+            ImageRect1TopRight.right = ImageRect1.right + 10;
+            ImageRect1TopRight.bottom = ImageRect1.top - 10;
  
             SetStretchBltMode(DeviceContextHandle, HALFTONE);
             StretchBlt(DeviceContextHandle, ImageRect1.left, ImageRect1.top, ImageRect1.right - ImageRect1.left, ImageRect1.bottom - ImageRect1.top, DeviceContextHandleImage, 0, 0, ImageHandleInfo.bmWidth, ImageHandleInfo.bmHeight, SRCCOPY);
@@ -198,6 +203,8 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             //FillRect(DeviceContextHandle, &TextRect3, GreenBrush);
             //FillRect(DeviceContextHandle, &TextRect4, GreenBrush);
             //FillRect(DeviceContextHandle, &ImageRect1, GreenBrush);
+            FillRect(DeviceContextHandle, &ImageRect1TopRight, GreenBrush);
+
             
             SetBkMode(DeviceContextHandle, TRANSPARENT);
  
@@ -297,6 +304,7 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
                 OffsetRect(&ImageRect1, NewMouseXPos - MouseXPos, NewMouseYPos - MouseYPos);
                 UnionRect(&UpdateRect, &UpdateRect, &ImageRect1);
                 InvalidateRect(WindowHandle, &UpdateRect, 1);
+                InvalidateRect(WindowHandle, &ImageRect1TopRight, 1);
  
                 MouseXPos = NewMouseXPos;
                 MouseYPos = NewMouseYPos;
