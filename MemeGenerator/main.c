@@ -189,9 +189,9 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             ImageRect1.bottom = ImageRect1.top + ((DestWidth * ImageHandleInfo.bmHeight) / ImageHandleInfo.bmWidth);
 
             ImageRect1TopRight.left = ImageRect1.right - 10;
-            ImageRect1TopRight.top = ImageRect1.top + 10;
+            ImageRect1TopRight.top = ImageRect1.top - 10;
             ImageRect1TopRight.right = ImageRect1.right + 10;
-            ImageRect1TopRight.bottom = ImageRect1.top - 10;
+            ImageRect1TopRight.bottom = ImageRect1.top + 10;
  
             SetStretchBltMode(DeviceContextHandle, HALFTONE);
             StretchBlt(DeviceContextHandle, ImageRect1.left, ImageRect1.top, ImageRect1.right - ImageRect1.left, ImageRect1.bottom - ImageRect1.top, DeviceContextHandleImage, 0, 0, ImageHandleInfo.bmWidth, ImageHandleInfo.bmHeight, SRCCOPY);
@@ -203,7 +203,7 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             //FillRect(DeviceContextHandle, &TextRect3, GreenBrush);
             //FillRect(DeviceContextHandle, &TextRect4, GreenBrush);
             //FillRect(DeviceContextHandle, &ImageRect1, GreenBrush);
-            FillRect(DeviceContextHandle, &ImageRect1TopRight, GreenBrush);
+            //FillRect(DeviceContextHandle, &ImageRect1TopRight, GreenBrush);
 
             
             SetBkMode(DeviceContextHandle, TRANSPARENT);
@@ -247,15 +247,19 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             
             break;
  
-        case WM_MOUSEMOVE:
-            // dragging code
-            
+        case WM_MOUSEMOVE:        
             POINT MouseLocation2 = {GET_X_LPARAM(LParam), GET_Y_LPARAM(LParam)};
             int IsInsideImageRect1ForDisplayAllArrow = PtInRect(&ImageRect1, MouseLocation2);
-            
+            int IsInsideImageRect1TopRightNESWArrow = PtInRect(&ImageRect1TopRight, MouseLocation2);
 
             if(IsInsideImageRect1ForDisplayAllArrow) {
+                OutputDebugStringA("inside image rect1\n");
                 SetCursor(LoadCursorA(0, IDC_SIZEALL));
+            }
+
+            if(IsInsideImageRect1TopRightNESWArrow) {
+                OutputDebugStringA("inside image rect1 topright\n");
+                SetCursor(LoadCursorA(0, IDC_SIZENESW));
             }
 
             if(IsLeftClicked && IsInsideTextRect1) {
