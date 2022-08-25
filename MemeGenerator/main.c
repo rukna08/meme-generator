@@ -13,6 +13,7 @@ int IsInsideTextRect3 = 0;
 int IsInsideTextRect4 = 0;
 
 int IsInsideImageRect1 = 0;
+int IsInsideImageRect2 = 0;
  
 int MouseXPos;
 int MouseYPos;
@@ -40,6 +41,9 @@ RECT TextRect4;
 RECT ImageRect1;
 RECT ImageRect1TopRight;
 
+RECT ImageRect2;
+RECT ImageRect2TopRight;
+
 SIZE SizeOfText1;
 SIZE SizeOfText2;
 SIZE SizeOfText3;
@@ -48,6 +52,10 @@ SIZE SizeOfText4;
 HDC DeviceContextHandleImage;
 HBITMAP ImageHandle;
 BITMAP ImageHandleInfo;
+
+HDC DeviceContextHandleImage2;
+HBITMAP ImageHandle2;
+BITMAP ImageHandleInfo2;
  
 COLORREF GreenColor = 0x0000FF00;
  
@@ -92,6 +100,14 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     ImageRect1TopRight.top = 0;
     ImageRect1TopRight.right = 0;
     ImageRect1TopRight.bottom = 0;
+
+    ImageRect2.left = 400;
+    ImageRect2.top = 50;
+
+    ImageRect2TopRight.left = 0;
+    ImageRect2TopRight.top = 0;
+    ImageRect2TopRight.right = 0;
+    ImageRect2TopRight.bottom = 0;
  
     SendMessage(TextField1, WM_SETFONT, (WPARAM)WindowControlFont, 1);
     SendMessage(TextField2, WM_SETFONT, (WPARAM)WindowControlFont, 1);
@@ -105,6 +121,12 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     
     DeviceContextHandleImage = CreateCompatibleDC(NULL);
     SelectObject(DeviceContextHandleImage, ImageHandle);
+
+    ImageHandle2 = (HBITMAP)LoadImageA(0, "C:\\Users\\ankur\\Desktop\\meme-generator\\MemeGenerator\\sample2.bmp", 0, 0, 0, LR_LOADFROMFILE);
+    GetObject(ImageHandle2, sizeof(BITMAP), &ImageHandleInfo2);
+    
+    DeviceContextHandleImage2 = CreateCompatibleDC(NULL);
+    SelectObject(DeviceContextHandleImage2, ImageHandle2);
     
     GreenBrush = CreateSolidBrush(GreenColor);
  
@@ -196,6 +218,18 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             SetStretchBltMode(DeviceContextHandle, HALFTONE);
             StretchBlt(DeviceContextHandle, ImageRect1.left, ImageRect1.top, ImageRect1.right - ImageRect1.left, ImageRect1.bottom - ImageRect1.top, DeviceContextHandleImage, 0, 0, ImageHandleInfo.bmWidth, ImageHandleInfo.bmHeight, SRCCOPY);
             
+            ImageRect2.right = ImageRect2.left + DestWidth;
+            ImageRect2.bottom = ImageRect2.top + ((DestWidth * ImageHandleInfo2.bmHeight) / ImageHandleInfo2.bmWidth);
+
+            ImageRect2TopRight.left = ImageRect2.right - 10;
+            ImageRect2TopRight.top = ImageRect2.top - 10;
+            ImageRect2TopRight.right = ImageRect2.right + 10;
+            ImageRect2TopRight.bottom = ImageRect2.top + 10;
+ 
+            SetStretchBltMode(DeviceContextHandle, HALFTONE);
+            StretchBlt(DeviceContextHandle, ImageRect2.left, ImageRect2.top, ImageRect2.right - ImageRect2.left, ImageRect2.bottom - ImageRect2.top, DeviceContextHandleImage2, 0, 0, ImageHandleInfo2.bmWidth, ImageHandleInfo2.bmHeight, SRCCOPY);
+
+
             SelectObject(DeviceContextHandle, WindowDrawFont);
  
             //FillRect(DeviceContextHandle, &TextRect1, GreenBrush);
@@ -232,7 +266,11 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
 
             IsInsideImageRect1 = PtInRect(&ImageRect1, MouseLocation);
 
+            IsInsideImageRect2 = PtInRect(&ImageRect2, MouseLocation);
+
+
             if(IsInsideImageRect1) OutputDebugStringA("Clicked inside image rect 1\n");
+            if(IsInsideImageRect2) OutputDebugStringA("Clicked inside image rect 2\n");
             
             break;
  
@@ -244,13 +282,17 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             IsInsideTextRect4 = 0;
 
             IsInsideImageRect1 = 0;
-            
+            IsInsideImageRect2 = 0;
+
             break;
  
         case WM_MOUSEMOVE:        
             POINT MouseLocation2 = {GET_X_LPARAM(LParam), GET_Y_LPARAM(LParam)};
             int IsInsideImageRect1ForDisplayAllArrow = PtInRect(&ImageRect1, MouseLocation2);
             int IsInsideImageRect1TopRightNESWArrow = PtInRect(&ImageRect1TopRight, MouseLocation2);
+
+            int IsInsideImageRect2ForDisplayAllArrow = PtInRect(&ImageRect2, MouseLocation2);
+            int IsInsideImageRect2TopRightNESWArrow = PtInRect(&ImageRect2TopRight, MouseLocation2);
 
             if(IsInsideImageRect1ForDisplayAllArrow) {
                 OutputDebugStringA("inside image rect1\n");
@@ -259,6 +301,16 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
 
             if(IsInsideImageRect1TopRightNESWArrow) {
                 OutputDebugStringA("inside image rect1 topright\n");
+                SetCursor(LoadCursorA(0, IDC_SIZENESW));
+            }
+
+            if(IsInsideImageRect2ForDisplayAllArrow) {
+                OutputDebugStringA("inside image rect2\n");
+                SetCursor(LoadCursorA(0, IDC_SIZEALL));
+            }
+
+            if(IsInsideImageRect2TopRightNESWArrow) {
+                OutputDebugStringA("inside image rect2 topright\n");
                 SetCursor(LoadCursorA(0, IDC_SIZENESW));
             }
 
@@ -309,6 +361,18 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
                 UnionRect(&UpdateRect, &UpdateRect, &ImageRect1);
                 InvalidateRect(WindowHandle, &UpdateRect, 1);
                 InvalidateRect(WindowHandle, &ImageRect1TopRight, 1);
+ 
+                MouseXPos = NewMouseXPos;
+                MouseYPos = NewMouseYPos;
+            } else if(IsLeftClicked && IsInsideImageRect2) {
+                int NewMouseXPos = GET_X_LPARAM(LParam);
+                int NewMouseYPos = GET_Y_LPARAM(LParam);
+                RECT UpdateRect = ImageRect2;
+ 
+                OffsetRect(&ImageRect2, NewMouseXPos - MouseXPos, NewMouseYPos - MouseYPos);
+                UnionRect(&UpdateRect, &UpdateRect, &ImageRect2);
+                InvalidateRect(WindowHandle, &UpdateRect, 1);
+                InvalidateRect(WindowHandle, &ImageRect2TopRight, 1);
  
                 MouseXPos = NewMouseXPos;
                 MouseYPos = NewMouseYPos;
