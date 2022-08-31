@@ -116,13 +116,13 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
  
     SendMessage(DisplayTextButton, WM_SETFONT, (WPARAM)WindowControlFont, 1);
  
-    ImageHandle = (HBITMAP)LoadImageA(0, "C:\\Users\\ankur\\Desktop\\meme-generator\\MemeGenerator\\sample.bmp", 0, 0, 0, LR_LOADFROMFILE);
+    ImageHandle = (HBITMAP)LoadImageA(0, "../sample.bmp", 0, 0, 0, LR_LOADFROMFILE);
     GetObject(ImageHandle, sizeof(BITMAP), &ImageHandleInfo);
     
     DeviceContextHandleImage = CreateCompatibleDC(NULL);
     SelectObject(DeviceContextHandleImage, ImageHandle);
 
-    ImageHandle2 = (HBITMAP)LoadImageA(0, "C:\\Users\\ankur\\Desktop\\meme-generator\\MemeGenerator\\sample2.bmp", 0, 0, 0, LR_LOADFROMFILE);
+    ImageHandle2 = (HBITMAP)LoadImageA(0, "../sample2.bmp", 0, 0, 0, LR_LOADFROMFILE);
     GetObject(ImageHandle2, sizeof(BITMAP), &ImageHandleInfo2);
     
     DeviceContextHandleImage2 = CreateCompatibleDC(NULL);
