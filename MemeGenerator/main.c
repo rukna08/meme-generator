@@ -3,6 +3,8 @@
 #include <string.h>
  
 #define BUTTON_DISPLAYTEXT 69
+
+#define DEBUG 1
  
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
  
@@ -89,7 +91,7 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     
     WindowControlFont = CreateFontIndirectA(&NonClientMetrics.lfMessageFont);
     
-    NonClientMetrics.lfMessageFont.lfHeight = 100;
+    NonClientMetrics.lfMessageFont.lfHeight = 50;
     
     WindowDrawFont = CreateFontIndirectA(&NonClientMetrics.lfMessageFont);
     
@@ -231,15 +233,14 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
 
 
             SelectObject(DeviceContextHandle, WindowDrawFont);
- 
-            //FillRect(DeviceContextHandle, &TextRect1, GreenBrush);
-            //FillRect(DeviceContextHandle, &TextRect2, GreenBrush);
-            //FillRect(DeviceContextHandle, &TextRect3, GreenBrush);
-            //FillRect(DeviceContextHandle, &TextRect4, GreenBrush);
-            //FillRect(DeviceContextHandle, &ImageRect1, GreenBrush);
-            //FillRect(DeviceContextHandle, &ImageRect1TopRight, GreenBrush);
 
-            
+            #if DEBUG
+            FillRect(DeviceContextHandle, &TextRect1, GreenBrush);
+            FillRect(DeviceContextHandle, &TextRect2, GreenBrush);
+            FillRect(DeviceContextHandle, &TextRect3, GreenBrush);
+            FillRect(DeviceContextHandle, &TextRect4, GreenBrush);
+            #endif
+
             SetBkMode(DeviceContextHandle, TRANSPARENT);
  
             DrawTextA(DeviceContextHandle, ToBeDisplayedText1, -1, &TextRect1, DT_LEFT | DT_NOPREFIX);
@@ -267,10 +268,6 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             IsInsideImageRect1 = PtInRect(&ImageRect1, MouseLocation);
 
             IsInsideImageRect2 = PtInRect(&ImageRect2, MouseLocation);
-
-
-            if(IsInsideImageRect1) OutputDebugStringA("Clicked inside image rect 1\n");
-            if(IsInsideImageRect2) OutputDebugStringA("Clicked inside image rect 2\n");
             
             break;
  
@@ -295,22 +292,18 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             int IsInsideImageRect2TopRightNESWArrow = PtInRect(&ImageRect2TopRight, MouseLocation2);
 
             if(IsInsideImageRect1ForDisplayAllArrow) {
-                OutputDebugStringA("inside image rect1\n");
                 SetCursor(LoadCursorA(0, IDC_SIZEALL));
             }
 
             if(IsInsideImageRect1TopRightNESWArrow) {
-                OutputDebugStringA("inside image rect1 topright\n");
                 SetCursor(LoadCursorA(0, IDC_SIZENESW));
             }
 
             if(IsInsideImageRect2ForDisplayAllArrow) {
-                OutputDebugStringA("inside image rect2\n");
                 SetCursor(LoadCursorA(0, IDC_SIZEALL));
             }
 
             if(IsInsideImageRect2TopRightNESWArrow) {
-                OutputDebugStringA("inside image rect2 topright\n");
                 SetCursor(LoadCursorA(0, IDC_SIZENESW));
             }
 
