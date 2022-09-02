@@ -7,6 +7,8 @@
 #define DEBUG 1
  
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
+
+int fontSize = 50;
  
 int IsLeftClicked = 0;
 int IsInsideTextRect1 = 0;
@@ -91,7 +93,7 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     
     WindowControlFont = CreateFontIndirectA(&NonClientMetrics.lfMessageFont);
     
-    NonClientMetrics.lfMessageFont.lfHeight = 50;
+    NonClientMetrics.lfMessageFont.lfHeight = fontSize;
     
     WindowDrawFont = CreateFontIndirectA(&NonClientMetrics.lfMessageFont);
     
