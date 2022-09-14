@@ -4,7 +4,7 @@
  
 #define BUTTON_DISPLAYTEXT 69
 
-#define DEBUG 1
+#define DEBUG 0
  
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -292,6 +292,10 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
 
             int IsInsideImageRect2ForDisplayAllArrow = PtInRect(&ImageRect2, MouseLocation2);
             int IsInsideImageRect2TopRightNESWArrow = PtInRect(&ImageRect2TopRight, MouseLocation2);
+
+            if(PtInRect(&TextRect1, MouseLocation2) || PtInRect(&TextRect2, MouseLocation2) || PtInRect(&TextRect3, MouseLocation2) || PtInRect(&TextRect4, MouseLocation2)) {
+                SetCursor(LoadCursorA(0, IDC_SIZEALL));
+            }
 
             if(IsInsideImageRect1ForDisplayAllArrow) {
                 SetCursor(LoadCursorA(0, IDC_SIZEALL));
