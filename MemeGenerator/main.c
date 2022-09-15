@@ -173,7 +173,7 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             InvalidateRect(WindowHandle, 0, 1);
 
             if(LOWORD(WParam) == BUTTON_OUTPUTIMAGE) {
-                MessageBoxA(0, "Output button pressed!", 0, MB_OK);
+                MessageBoxA(0, "Output button pressed!", "Info", MB_OK | MB_ICONINFORMATION);
             }
  
             if(LOWORD(WParam) == BUTTON_DISPLAYTEXT) {
