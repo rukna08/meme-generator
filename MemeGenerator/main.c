@@ -3,6 +3,7 @@
 #include <string.h>
  
 #define BUTTON_DISPLAYTEXT 69
+#define BUTTON_OUTPUTIMAGE 420
 
 #define DEBUG 0
  
@@ -65,6 +66,7 @@ HBITMAP ImageHandle2;
 BITMAP ImageHandleInfo2;
  
 COLORREF GreenColor = 0x0000FF00;
+COLORREF BlackColor = 0x00000000;
  
 int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, int CommandShow) {
     WNDCLASSEXA WindowClass = {0};
@@ -88,7 +90,9 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     TextField4 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 130, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
     
     HWND DisplayTextButton = CreateWindowA("BUTTON", "Display Text", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 170, 100, 30, WindowHandle, (HMENU)BUTTON_DISPLAYTEXT, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
- 
+    HWND OutputImageButton = CreateWindowA("BUTTON", "Output Image", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 205, 100, 30, WindowHandle, (HMENU)BUTTON_OUTPUTIMAGE, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
+
+
     NONCLIENTMETRICSA NonClientMetrics;
     NonClientMetrics.cbSize = sizeof(NonClientMetrics);
     
@@ -122,6 +126,7 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     SendMessage(TextField4, WM_SETFONT, (WPARAM)WindowControlFont, 1);
  
     SendMessage(DisplayTextButton, WM_SETFONT, (WPARAM)WindowControlFont, 1);
+    SendMessage(OutputImageButton, WM_SETFONT, (WPARAM)WindowControlFont, 1);
  
     ImageHandle = (HBITMAP)LoadImageA(0, "../sample.bmp", 0, 0, 0, LR_LOADFROMFILE);
     GetObject(ImageHandle, sizeof(BITMAP), &ImageHandleInfo);
@@ -166,9 +171,12 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
  
         case WM_COMMAND:
             InvalidateRect(WindowHandle, 0, 1);
+
+            if(LOWORD(WParam) == BUTTON_OUTPUTIMAGE) {
+                MessageBoxA(0, "Output button pressed!", 0, MB_OK);
+            }
  
             if(LOWORD(WParam) == BUTTON_DISPLAYTEXT) {
- 
                 GetWindowTextA(TextField1, ToBeDisplayedText1, 100);
                 GetWindowTextA(TextField2, ToBeDisplayedText2, 100);
                 GetWindowTextA(TextField3, ToBeDisplayedText3, 100);
@@ -240,22 +248,22 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
 
             // north line
             for(int i = 20; i < WindowWidth - 40; i++) {
-                SetPixel(DeviceContextHandle, i, 300, 0x00000000);
+                SetPixel(DeviceContextHandle, i, 300, BlackColor);
             }
 
             // south line
             for(int i = 20; i < WindowWidth - 40; i++) {
-                SetPixel(DeviceContextHandle, i, WindowHeight - 60, 0x00000000);
+                SetPixel(DeviceContextHandle, i, WindowHeight - 60, BlackColor);
             }
 
             // west line
             for(int i = 300; i < WindowHeight - 60; i++) {
-                SetPixel(DeviceContextHandle, 20, i, 0x00000000);
+                SetPixel(DeviceContextHandle, 20, i, BlackColor);
             }
 
             // east line
             for(int i = 300; i < WindowHeight - 60; i++) {
-                SetPixel(DeviceContextHandle, WindowWidth - 40, i, 0x00000000);
+                SetPixel(DeviceContextHandle, WindowWidth - 40, i, BlackColor);
             }
 
             // -------------------------------------
