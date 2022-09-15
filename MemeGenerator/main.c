@@ -8,7 +8,10 @@
  
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 
-int fontSize = 50;
+int WindowWidth = 800;
+int WindowHeight = 900;
+
+int FontSize = 50;
  
 int IsLeftClicked = 0;
 int IsInsideTextRect1 = 0;
@@ -77,7 +80,7 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     
     RegisterClassExA(&WindowClass);
     
-    HWND WindowHandle = CreateWindowExA(WS_EX_CLIENTEDGE | WS_EX_COMPOSITED, WindowClass.lpszClassName, "Meme Generator", WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MAXIMIZEBOX) , CW_USEDEFAULT, CW_USEDEFAULT, 800, 400, 0, 0, Instance, 0);
+    HWND WindowHandle = CreateWindowExA(WS_EX_CLIENTEDGE | WS_EX_COMPOSITED, WindowClass.lpszClassName, "Meme Generator", WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MAXIMIZEBOX) , CW_USEDEFAULT, CW_USEDEFAULT, WindowWidth, WindowHeight, 0, 0, Instance, 0);
  
     TextField1 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 10, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
     TextField2 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 50, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
@@ -93,7 +96,7 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     
     WindowControlFont = CreateFontIndirectA(&NonClientMetrics.lfMessageFont);
     
-    NonClientMetrics.lfMessageFont.lfHeight = fontSize;
+    NonClientMetrics.lfMessageFont.lfHeight = FontSize;
     
     WindowDrawFont = CreateFontIndirectA(&NonClientMetrics.lfMessageFont);
     
@@ -232,6 +235,30 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
  
             SetStretchBltMode(DeviceContextHandle, HALFTONE);
             StretchBlt(DeviceContextHandle, ImageRect2.left, ImageRect2.top, ImageRect2.right - ImageRect2.left, ImageRect2.bottom - ImageRect2.top, DeviceContextHandleImage2, 0, 0, ImageHandleInfo2.bmWidth, ImageHandleInfo2.bmHeight, SRCCOPY);
+
+            // ------ Final Image export area ------
+
+            // north line
+            for(int i = 20; i < WindowWidth - 40; i++) {
+                SetPixel(DeviceContextHandle, i, 300, 0x00000000);
+            }
+
+            // south line
+            for(int i = 20; i < WindowWidth - 40; i++) {
+                SetPixel(DeviceContextHandle, i, WindowHeight - 60, 0x00000000);
+            }
+
+            // west line
+            for(int i = 300; i < WindowHeight - 60; i++) {
+                SetPixel(DeviceContextHandle, 20, i, 0x00000000);
+            }
+
+            // east line
+            for(int i = 300; i < WindowHeight - 60; i++) {
+                SetPixel(DeviceContextHandle, WindowWidth - 40, i, 0x00000000);
+            }
+
+            // -------------------------------------
 
 
             SelectObject(DeviceContextHandle, WindowDrawFont);
