@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <string.h>
+#include <stdlib.h>
  
 #define BUTTON_DISPLAYTEXT 69
 #define BUTTON_OUTPUTIMAGE 420
@@ -173,7 +174,36 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             InvalidateRect(WindowHandle, 0, 1);
 
             if(LOWORD(WParam) == BUTTON_OUTPUTIMAGE) {
-                MessageBoxA(0, "Output button pressed!", "Info", MB_OK | MB_ICONINFORMATION);
+                BITMAPINFO OutputImageBitmapInfo = {0};
+                OutputImageBitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+
+                HDC TemporaryDC = GetDC(WindowHandle);
+
+                GetDIBits(TemporaryDC, GetCurrentObject(TemporaryDC, OBJ_BITMAP), 0, WindowHeight, 0, &OutputImageBitmapInfo, DIB_RGB_COLORS);
+
+                LPVOID PixelDataBuffer = malloc(OutputImageBitmapInfo.bmiHeader.biSizeImage);
+
+                GetDIBits(TemporaryDC, GetCurrentObject(TemporaryDC, OBJ_BITMAP), 0, WindowHeight, PixelDataBuffer, &OutputImageBitmapInfo, DIB_RGB_COLORS);
+
+                ReleaseDC(WindowHandle, TemporaryDC);
+
+                BITMAPFILEHEADER BitmapFileHeader = {0};
+
+                BitmapFileHeader.bfType = 'BM';
+                BitmapFileHeader.bfSize = OutputImageBitmapInfo.bmiHeader.biSizeImage + sizeof(BITMAPINFO) + sizeof(BITMAPFILEHEADER);
+                BitmapFileHeader.bfOffBits = sizeof(BITMAPINFO) + sizeof(BITMAPFILEHEADER);
+
+                // ------------ Exporting the image --------------
+
+                HANDLE OutputImageFileHandle = CreateFileA("../output.bmp", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+                
+                WriteFile(OutputImageFileHandle, &BitmapFileHeader, sizeof(BitmapFileHeader), 0, 0);
+                WriteFile(OutputImageFileHandle, &OutputImageBitmapInfo, sizeof(OutputImageBitmapInfo), 0, 0);
+                WriteFile(OutputImageFileHandle, PixelDataBuffer, OutputImageBitmapInfo.bmiHeader.biSizeImage, 0, 0);
+
+                // -----------------------------------------------
+
+                MessageBoxA(0, "Output Image Exported!", "Info", MB_OK | MB_ICONINFORMATION);
             }
  
             if(LOWORD(WParam) == BUTTON_DISPLAYTEXT) {
