@@ -5,14 +5,14 @@
  
 #define BUTTON_DISPLAYTEXT 69
 #define BUTTON_OUTPUTIMAGE 420
-
+ 
 #define DEBUG 0
  
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
-
+ 
 int WindowWidth = 800;
 int WindowHeight = 900;
-
+ 
 int FontSize = 50;
  
 int IsLeftClicked = 0;
@@ -20,7 +20,7 @@ int IsInsideTextRect1 = 0;
 int IsInsideTextRect2 = 0;
 int IsInsideTextRect3 = 0;
 int IsInsideTextRect4 = 0;
-
+ 
 int IsInsideImageRect1 = 0;
 int IsInsideImageRect2 = 0;
  
@@ -46,13 +46,13 @@ RECT TextRect1;
 RECT TextRect2;
 RECT TextRect3;
 RECT TextRect4;
-
+ 
 RECT ImageRect1;
 RECT ImageRect1TopRight;
-
+ 
 RECT ImageRect2;
 RECT ImageRect2TopRight;
-
+ 
 SIZE SizeOfText1;
 SIZE SizeOfText2;
 SIZE SizeOfText3;
@@ -61,7 +61,7 @@ SIZE SizeOfText4;
 HDC DeviceContextHandleImage;
 HBITMAP ImageHandle;
 BITMAP ImageHandleInfo;
-
+ 
 HDC DeviceContextHandleImage2;
 HBITMAP ImageHandle2;
 BITMAP ImageHandleInfo2;
@@ -92,8 +92,8 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     
     HWND DisplayTextButton = CreateWindowA("BUTTON", "Display Text", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 170, 100, 30, WindowHandle, (HMENU)BUTTON_DISPLAYTEXT, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
     HWND OutputImageButton = CreateWindowA("BUTTON", "Output Image", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 205, 100, 30, WindowHandle, (HMENU)BUTTON_OUTPUTIMAGE, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
-
-
+ 
+ 
     NONCLIENTMETRICSA NonClientMetrics;
     NonClientMetrics.cbSize = sizeof(NonClientMetrics);
     
@@ -107,15 +107,15 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     
     ImageRect1.left = 400;
     ImageRect1.top = 50;
-
+ 
     ImageRect1TopRight.left = 0;
     ImageRect1TopRight.top = 0;
     ImageRect1TopRight.right = 0;
     ImageRect1TopRight.bottom = 0;
-
+ 
     ImageRect2.left = 400;
     ImageRect2.top = 50;
-
+ 
     ImageRect2TopRight.left = 0;
     ImageRect2TopRight.top = 0;
     ImageRect2TopRight.right = 0;
@@ -134,7 +134,7 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     
     DeviceContextHandleImage = CreateCompatibleDC(NULL);
     SelectObject(DeviceContextHandleImage, ImageHandle);
-
+ 
     ImageHandle2 = (HBITMAP)LoadImageA(0, "../sample2.bmp", 0, 0, 0, LR_LOADFROMFILE);
     GetObject(ImageHandle2, sizeof(BITMAP), &ImageHandleInfo2);
     
@@ -172,37 +172,38 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
  
         case WM_COMMAND:
             InvalidateRect(WindowHandle, 0, 1);
-
+ 
             if(LOWORD(WParam) == BUTTON_OUTPUTIMAGE) {
                 BITMAPINFO OutputImageBitmapInfo = {0};
                 OutputImageBitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-
+ 
                 HDC TemporaryDC = GetDC(WindowHandle);
-
+ 
                 GetDIBits(TemporaryDC, GetCurrentObject(TemporaryDC, OBJ_BITMAP), 0, WindowHeight, 0, &OutputImageBitmapInfo, DIB_RGB_COLORS);
 
                 LPVOID PixelDataBuffer = malloc(OutputImageBitmapInfo.bmiHeader.biSizeImage);
-
+ 
                 GetDIBits(TemporaryDC, GetCurrentObject(TemporaryDC, OBJ_BITMAP), 0, WindowHeight, PixelDataBuffer, &OutputImageBitmapInfo, DIB_RGB_COLORS);
-
+ 
                 ReleaseDC(WindowHandle, TemporaryDC);
-
+ 
                 BITMAPFILEHEADER BitmapFileHeader = {0};
-
-                BitmapFileHeader.bfType = 'BM';
+ 
+                BitmapFileHeader.bfType = 'MB';
                 BitmapFileHeader.bfSize = OutputImageBitmapInfo.bmiHeader.biSizeImage + sizeof(BITMAPINFO) + sizeof(BITMAPFILEHEADER);
                 BitmapFileHeader.bfOffBits = sizeof(BITMAPINFO) + sizeof(BITMAPFILEHEADER);
-
+ 
                 // ------------ Exporting the image --------------
-
-                HANDLE OutputImageFileHandle = CreateFileA("../output.bmp", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+ 
+                HANDLE OutputImageFileHandle = CreateFileA("../output.ppm", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
                 
-                WriteFile(OutputImageFileHandle, &BitmapFileHeader, sizeof(BitmapFileHeader), 0, 0);
-                WriteFile(OutputImageFileHandle, &OutputImageBitmapInfo, sizeof(OutputImageBitmapInfo), 0, 0);
-                WriteFile(OutputImageFileHandle, PixelDataBuffer, OutputImageBitmapInfo.bmiHeader.biSizeImage, 0, 0);
+                // WriteFile(OutputImageFileHandle, &BitmapFileHeader, sizeof(BitmapFileHeader), 0, 0);
+                // WriteFile(OutputImageFileHandle, &OutputImageBitmapInfo, sizeof(OutputImageBitmapInfo), 0, 0);
+                // WriteFile(OutputImageFileHandle, PixelDataBuffer, OutputImageBitmapInfo.bmiHeader.biSizeImage, 0, 0);
 
+ 
                 // -----------------------------------------------
-
+ 
                 MessageBoxA(0, "Output Image Exported!", "Info", MB_OK | MB_ICONINFORMATION);
             }
  
@@ -251,10 +252,10 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             HDC DeviceContextHandle = BeginPaint(WindowHandle, &PaintStruct);
  
             int DestWidth = 200;
-
+ 
             ImageRect1.right = ImageRect1.left + DestWidth;
             ImageRect1.bottom = ImageRect1.top + ((DestWidth * ImageHandleInfo.bmHeight) / ImageHandleInfo.bmWidth);
-
+ 
             ImageRect1TopRight.left = ImageRect1.right - 10;
             ImageRect1TopRight.top = ImageRect1.top - 10;
             ImageRect1TopRight.right = ImageRect1.right + 10;
@@ -265,7 +266,7 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             
             ImageRect2.right = ImageRect2.left + DestWidth;
             ImageRect2.bottom = ImageRect2.top + ((DestWidth * ImageHandleInfo2.bmHeight) / ImageHandleInfo2.bmWidth);
-
+ 
             ImageRect2TopRight.left = ImageRect2.right - 10;
             ImageRect2TopRight.top = ImageRect2.top - 10;
             ImageRect2TopRight.right = ImageRect2.right + 10;
@@ -273,41 +274,41 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
  
             SetStretchBltMode(DeviceContextHandle, HALFTONE);
             StretchBlt(DeviceContextHandle, ImageRect2.left, ImageRect2.top, ImageRect2.right - ImageRect2.left, ImageRect2.bottom - ImageRect2.top, DeviceContextHandleImage2, 0, 0, ImageHandleInfo2.bmWidth, ImageHandleInfo2.bmHeight, SRCCOPY);
-
+ 
             // ------ Final Image export area ------
-
+ 
             // north line
             for(int i = 20; i < WindowWidth - 40; i++) {
                 SetPixel(DeviceContextHandle, i, 300, BlackColor);
             }
-
+ 
             // south line
             for(int i = 20; i < WindowWidth - 40; i++) {
                 SetPixel(DeviceContextHandle, i, WindowHeight - 60, BlackColor);
             }
-
+ 
             // west line
             for(int i = 300; i < WindowHeight - 60; i++) {
                 SetPixel(DeviceContextHandle, 20, i, BlackColor);
             }
-
+ 
             // east line
             for(int i = 300; i < WindowHeight - 60; i++) {
                 SetPixel(DeviceContextHandle, WindowWidth - 40, i, BlackColor);
             }
-
+ 
             // -------------------------------------
-
-
+ 
+ 
             SelectObject(DeviceContextHandle, WindowDrawFont);
-
+ 
             #if DEBUG
             FillRect(DeviceContextHandle, &TextRect1, GreenBrush);
             FillRect(DeviceContextHandle, &TextRect2, GreenBrush);
             FillRect(DeviceContextHandle, &TextRect3, GreenBrush);
             FillRect(DeviceContextHandle, &TextRect4, GreenBrush);
             #endif
-
+ 
             SetBkMode(DeviceContextHandle, TRANSPARENT);
  
             DrawTextA(DeviceContextHandle, ToBeDisplayedText1, -1, &TextRect1, DT_LEFT | DT_NOPREFIX);
@@ -316,7 +317,7 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             DrawTextA(DeviceContextHandle, ToBeDisplayedText4, -1, &TextRect4, DT_LEFT | DT_NOPREFIX);
             
             EndPaint(WindowHandle, &PaintStruct);
-
+ 
             break;
  
         case WM_LBUTTONDOWN:
@@ -331,9 +332,9 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             IsInsideTextRect2 = PtInRect(&TextRect2, MouseLocation);
             IsInsideTextRect3 = PtInRect(&TextRect3, MouseLocation);
             IsInsideTextRect4 = PtInRect(&TextRect4, MouseLocation);
-
+ 
             IsInsideImageRect1 = PtInRect(&ImageRect1, MouseLocation);
-
+ 
             IsInsideImageRect2 = PtInRect(&ImageRect2, MouseLocation);
             
             break;
@@ -344,40 +345,40 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             IsInsideTextRect2 = 0;
             IsInsideTextRect3 = 0;
             IsInsideTextRect4 = 0;
-
+ 
             IsInsideImageRect1 = 0;
             IsInsideImageRect2 = 0;
-
+ 
             break;
  
         case WM_MOUSEMOVE:        
             POINT MouseLocation2 = {GET_X_LPARAM(LParam), GET_Y_LPARAM(LParam)};
             int IsInsideImageRect1ForDisplayAllArrow = PtInRect(&ImageRect1, MouseLocation2);
             int IsInsideImageRect1TopRightNESWArrow = PtInRect(&ImageRect1TopRight, MouseLocation2);
-
+ 
             int IsInsideImageRect2ForDisplayAllArrow = PtInRect(&ImageRect2, MouseLocation2);
             int IsInsideImageRect2TopRightNESWArrow = PtInRect(&ImageRect2TopRight, MouseLocation2);
-
+ 
             if(PtInRect(&TextRect1, MouseLocation2) || PtInRect(&TextRect2, MouseLocation2) || PtInRect(&TextRect3, MouseLocation2) || PtInRect(&TextRect4, MouseLocation2)) {
                 SetCursor(LoadCursorA(0, IDC_SIZEALL));
             }
-
+ 
             if(IsInsideImageRect1ForDisplayAllArrow) {
                 SetCursor(LoadCursorA(0, IDC_SIZEALL));
             }
-
+ 
             if(IsInsideImageRect1TopRightNESWArrow) {
                 SetCursor(LoadCursorA(0, IDC_SIZENESW));
             }
-
+ 
             if(IsInsideImageRect2ForDisplayAllArrow) {
                 SetCursor(LoadCursorA(0, IDC_SIZEALL));
             }
-
+ 
             if(IsInsideImageRect2TopRightNESWArrow) {
                 SetCursor(LoadCursorA(0, IDC_SIZENESW));
             }
-
+ 
             if(IsLeftClicked && IsInsideTextRect1) {
                 int NewMouseXPos = GET_X_LPARAM(LParam);
                 int NewMouseYPos = GET_Y_LPARAM(LParam);
