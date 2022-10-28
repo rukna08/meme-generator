@@ -1,15 +1,18 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
  
 #define BUTTON_DISPLAYTEXT 69
-#define BUTTON_OUTPUTIMAGE 420
+#define BUTTON_COPYIMAGE 420
  
 #define DEBUG 0
  
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
- 
+
+void GetScreenShot();
+
 int WindowWidth = 800;
 int WindowHeight = 900;
  
@@ -68,6 +71,8 @@ BITMAP ImageHandleInfo2;
  
 COLORREF GreenColor = 0x0000FF00;
 COLORREF BlackColor = 0x00000000;
+
+HWND WindowHandle;
  
 int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, int CommandShow) {
     WNDCLASSEXA WindowClass = {0};
@@ -83,7 +88,7 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     
     RegisterClassExA(&WindowClass);
     
-    HWND WindowHandle = CreateWindowExA(WS_EX_CLIENTEDGE | WS_EX_COMPOSITED, WindowClass.lpszClassName, "Meme Generator", WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MAXIMIZEBOX) , CW_USEDEFAULT, CW_USEDEFAULT, WindowWidth, WindowHeight, 0, 0, Instance, 0);
+    WindowHandle = CreateWindowExA(WS_EX_CLIENTEDGE | WS_EX_COMPOSITED, WindowClass.lpszClassName, "Meme Generator", WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MAXIMIZEBOX) , CW_USEDEFAULT, CW_USEDEFAULT, WindowWidth, WindowHeight, 0, 0, Instance, 0);
  
     TextField1 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 10, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
     TextField2 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 50, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
@@ -91,7 +96,7 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     TextField4 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 130, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
     
     HWND DisplayTextButton = CreateWindowA("BUTTON", "Display Text", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 170, 100, 30, WindowHandle, (HMENU)BUTTON_DISPLAYTEXT, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
-    HWND OutputImageButton = CreateWindowA("BUTTON", "Output Image", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 205, 100, 30, WindowHandle, (HMENU)BUTTON_OUTPUTIMAGE, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
+    HWND CopyImageButton = CreateWindowA("BUTTON", "Copy Image", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 205, 100, 30, WindowHandle, (HMENU)BUTTON_COPYIMAGE, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
  
  
     NONCLIENTMETRICSA NonClientMetrics;
@@ -127,7 +132,7 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     SendMessage(TextField4, WM_SETFONT, (WPARAM)WindowControlFont, 1);
  
     SendMessage(DisplayTextButton, WM_SETFONT, (WPARAM)WindowControlFont, 1);
-    SendMessage(OutputImageButton, WM_SETFONT, (WPARAM)WindowControlFont, 1);
+    SendMessage(CopyImageButton, WM_SETFONT, (WPARAM)WindowControlFont, 1);
  
     ImageHandle = (HBITMAP)LoadImageA(0, "../sample.bmp", 0, 0, 0, LR_LOADFROMFILE);
     GetObject(ImageHandle, sizeof(BITMAP), &ImageHandleInfo);
@@ -173,7 +178,7 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
         case WM_COMMAND:
             InvalidateRect(WindowHandle, 0, 1);
  
-            if(LOWORD(WParam) == BUTTON_OUTPUTIMAGE) {
+            if(LOWORD(WParam) == BUTTON_COPYIMAGE) {
                 BITMAPINFO OutputImageBitmapInfo = {0};
                 OutputImageBitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
  
@@ -194,17 +199,10 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
                 BitmapFileHeader.bfOffBits = sizeof(BITMAPINFO) + sizeof(BITMAPFILEHEADER);
  
                 // ------------ Exporting the image --------------
- 
-                HANDLE OutputImageFileHandle = CreateFileA("../output.ppm", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
-                
-                // WriteFile(OutputImageFileHandle, &BitmapFileHeader, sizeof(BitmapFileHeader), 0, 0);
-                // WriteFile(OutputImageFileHandle, &OutputImageBitmapInfo, sizeof(OutputImageBitmapInfo), 0, 0);
-                // WriteFile(OutputImageFileHandle, PixelDataBuffer, OutputImageBitmapInfo.bmiHeader.biSizeImage, 0, 0);
 
- 
-                // -----------------------------------------------
- 
-                MessageBoxA(0, "Output Image Exported!", "Info", MB_OK | MB_ICONINFORMATION);
+                GetScreenShot();
+
+                MessageBoxA(0, "Output Image copied!", "Info", MB_OK | MB_ICONINFORMATION);
             }
  
             if(LOWORD(WParam) == BUTTON_DISPLAYTEXT) {
@@ -450,4 +448,31 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
     }
     
     return 0;
+}
+
+void GetScreenShot() {
+    int x1, y1, x2, y2, w, h;
+
+    x1  = GetSystemMetrics(SM_XVIRTUALSCREEN);
+    y1  = GetSystemMetrics(SM_YVIRTUALSCREEN) + 280;
+    x2  = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+    y2  = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+    w   = x2 - x1 - 1140;
+    h   = y2 - y1 - 225;
+
+    HDC     hScreen = GetDC(WindowHandle);
+    HDC     hDC     = CreateCompatibleDC(hScreen);
+    HBITMAP hBitmap = CreateCompatibleBitmap(hScreen, w, h);
+    HGDIOBJ old_obj = SelectObject(hDC, hBitmap);
+    BOOL    bRet    = BitBlt(hDC, 0, 0, w, h, hScreen, x1, y1, SRCCOPY);
+
+    OpenClipboard(NULL);
+    EmptyClipboard();
+    SetClipboardData(CF_BITMAP, hBitmap);
+    CloseClipboard();   
+
+    SelectObject(hDC, old_obj);
+    DeleteDC(hDC);
+    ReleaseDC(NULL, hScreen);
+    DeleteObject(hBitmap);
 }
