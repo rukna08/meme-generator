@@ -148,7 +148,6 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     
     GreenBrush = CreateSolidBrush(GreenColor);
  
-    ShowWindow(WindowHandle, CommandShow);
     UpdateWindow(WindowHandle);
  
     MSG Message = {0};
