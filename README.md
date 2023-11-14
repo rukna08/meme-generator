@@ -1,2 +1,2 @@
 # meme_generator
-meme generator made in c
+meme generator made in C
