@@ -1,2 +1,2 @@
-# meme-generator
-simple meme generator made with c (win32 api)
+# meme_generator
+meme generator made in c
