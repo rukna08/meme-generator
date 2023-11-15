@@ -178,6 +178,18 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
  
         case WM_COMMAND:
             InvalidateRect(WindowHandle, 0, 1);
+
+            if(LOWORD(WParam) == BUTTON_OPENIMAGE) {
+
+                MessageBoxA(WindowHandle, "open image!", 0, MB_OK);
+
+                OPENFILENAMEA open_file_name_structure = {0};
+
+                int open_file_return_value = GetOpenFileNameA(&open_file_name_structure);
+
+                printf("open_file_return_value: %d", open_file_return_value);
+
+            }
  
             if(LOWORD(WParam) == BUTTON_COPYIMAGE) {
                 BITMAPINFO OutputImageBitmapInfo = {0};
