@@ -5,7 +5,8 @@
 #include <stdlib.h>
  
 #define BUTTON_DISPLAYTEXT 69
-#define BUTTON_COPYIMAGE 420
+#define BUTTON_COPYIMAGE   420
+#define BUTTON_OPENIMAGE   582
  
 #define DEBUG 0
  
@@ -96,8 +97,8 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     TextField4 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 130, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
     
     HWND DisplayTextButton = CreateWindowA("BUTTON", "Display Text", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 170, 100, 30, WindowHandle, (HMENU)BUTTON_DISPLAYTEXT, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
-    HWND CopyImageButton = CreateWindowA("BUTTON", "Copy Image", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 205, 100, 30, WindowHandle, (HMENU)BUTTON_COPYIMAGE, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
- 
+    HWND CopyImageButton   = CreateWindowA("BUTTON", "Copy Image",   WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 205, 100, 30, WindowHandle, (HMENU)BUTTON_COPYIMAGE, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
+    HWND open_image_button = CreateWindowA("BUTTON", "Open Image",   WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 240, 100, 30, WindowHandle, (HMENU)BUTTON_OPENIMAGE, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
  
     NONCLIENTMETRICSA NonClientMetrics;
     NonClientMetrics.cbSize = sizeof(NonClientMetrics);
@@ -132,7 +133,8 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     SendMessage(TextField4, WM_SETFONT, (WPARAM)WindowControlFont, 1);
  
     SendMessage(DisplayTextButton, WM_SETFONT, (WPARAM)WindowControlFont, 1);
-    SendMessage(CopyImageButton, WM_SETFONT, (WPARAM)WindowControlFont, 1);
+    SendMessage(CopyImageButton,   WM_SETFONT, (WPARAM)WindowControlFont, 1);
+    SendMessage(open_image_button, WM_SETFONT, (WPARAM)WindowControlFont, 1);
  
     ImageHandle = (HBITMAP)LoadImageA(0, "../data/sample.bmp", 0, 0, 0, LR_LOADFROMFILE);
     GetObject(ImageHandle, sizeof(BITMAP), &ImageHandleInfo);
@@ -295,7 +297,6 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             }
  
             // -------------------------------------
- 
  
             SelectObject(DeviceContextHandle, WindowDrawFont);
  
