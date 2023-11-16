@@ -13,6 +13,7 @@
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 
 void GetScreenShot();
+char* display_opendialog();
 
 int WindowWidth = 800;
 int WindowHeight = 900;
@@ -182,39 +183,8 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
 
             if(LOWORD(WParam) == BUTTON_OPENIMAGE) {
 
-                MessageBoxA(WindowHandle, "open image!", 0, MB_OK);
-
-                OPENFILENAME ofn;
-                char szFile[260];
-                HWND hwnd = WindowHandle;
-                
-                // handle to the file idk
-                HANDLE hf;
-
-                // similar to ofn = {0};
-                ZeroMemory(&ofn, sizeof(ofn));
-
-                ofn.lStructSize             = sizeof(ofn);
-                ofn.hwndOwner               = hwnd;
-                ofn.lpstrFile               = szFile;
-                ofn.lpstrFile[0]            = '\0';
-                ofn.nMaxFile                = sizeof(szFile);
-                ofn.lpstrFilter             = ".BMP";
-                ofn.nFilterIndex            = 1;
-                ofn.nMaxFileTitle           = 0;
-                ofn.lpstrInitialDir         = 0;
-                ofn.lpstrInitialDir         = 0;
-                ofn.Flags                   = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-
-
-
-                if(GetOpenFileNameA(&ofn) == TRUE) {
-
-                    hf = CreateFile(ofn.lpstrFile, GENERIC_READ, 0, (LPSECURITY_ATTRIBUTES)0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)0);
-
-                }
-
-
+                char* file_path = display_opendialog();
+                OutputDebugStringA(file_path);
 
             }
  
@@ -604,4 +574,35 @@ void GetScreenShot() {
     DeleteDC(hDC);
     ReleaseDC(NULL, hScreen);
     DeleteObject(hBitmap);
+}
+
+char* display_opendialog() {
+
+    /// FILE OPEN DIALOG BOX ///
+
+    OPENFILENAME ofn;
+    char szFile[260];
+    HWND hwnd = WindowHandle;
+    
+    // handle to the file idk
+    HANDLE hf;
+
+    // similar to ofn = {0};
+    ZeroMemory(&ofn, sizeof(ofn));
+
+    ofn.lStructSize             = sizeof(ofn);
+    ofn.hwndOwner               = hwnd;
+    ofn.lpstrFile               = szFile;
+    ofn.lpstrFile[0]            = '\0';
+    ofn.nMaxFile                = sizeof(szFile);
+    ofn.lpstrFilter             = ".BMP";
+    ofn.nFilterIndex            = 1;
+    ofn.nMaxFileTitle           = 0;
+    ofn.lpstrInitialDir         = 0;
+    ofn.lpstrInitialDir         = 0;
+    ofn.Flags                   = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+    GetOpenFileNameA(&ofn);
+
+    return ofn.lpstrFile;
 }
