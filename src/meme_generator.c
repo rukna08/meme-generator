@@ -74,6 +74,7 @@ COLORREF GreenColor = 0x0000FF00;
 COLORREF BlackColor = 0x00000000;
 
 HWND WindowHandle;
+HINSTANCE instance_handle;
  
 int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, int CommandShow) {
     WNDCLASSEXA WindowClass = {0};
@@ -183,11 +184,37 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
 
                 MessageBoxA(WindowHandle, "open image!", 0, MB_OK);
 
-                OPENFILENAMEA open_file_name_structure = {0};
+                OPENFILENAME ofn;
+                char szFile[260];
+                HWND hwnd = WindowHandle;
+                
+                // handle to the file idk
+                HANDLE hf;
 
-                int open_file_return_value = GetOpenFileNameA(&open_file_name_structure);
+                // similar to ofn = {0};
+                ZeroMemory(&ofn, sizeof(ofn));
 
-                printf("open_file_return_value: %d", open_file_return_value);
+                ofn.lStructSize             = sizeof(ofn);
+                ofn.hwndOwner               = hwnd;
+                ofn.lpstrFile               = szFile;
+                ofn.lpstrFile[0]            = '\0';
+                ofn.nMaxFile                = sizeof(szFile);
+                ofn.lpstrFilter             = ".BMP";
+                ofn.nFilterIndex            = 1;
+                ofn.nMaxFileTitle           = 0;
+                ofn.lpstrInitialDir         = 0;
+                ofn.lpstrInitialDir         = 0;
+                ofn.Flags                   = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+
+
+                if(GetOpenFileNameA(&ofn) == TRUE) {
+
+                    hf = CreateFile(ofn.lpstrFile, GENERIC_READ, 0, (LPSECURITY_ATTRIBUTES)0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)0);
+
+                }
+
+
 
             }
  
