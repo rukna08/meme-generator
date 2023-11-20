@@ -419,11 +419,20 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
  
         case WM_MOUSEMOVE:        
             POINT MouseLocation2 = {GET_X_LPARAM(LParam), GET_Y_LPARAM(LParam)};
+
+
+
             int IsInsideImageRect1ForDisplayAllArrow = PtInRect(&ImageRect1, MouseLocation2);
             int IsInsideImageRect1TopRightNESWArrow = PtInRect(&ImageRect1TopRight, MouseLocation2);
  
             int IsInsideImageRect2ForDisplayAllArrow = PtInRect(&ImageRect2, MouseLocation2);
             int IsInsideImageRect2TopRightNESWArrow = PtInRect(&ImageRect2TopRight, MouseLocation2);
+
+            for(int i = 0; i < image_handle_index; i++) {
+                if(PtInRect(&image_rects[i], MouseLocation2)) {
+                    SetCursor(LoadCursorA(0, IDC_SIZEALL));
+                }
+            }
  
             if(PtInRect(&TextRect1, MouseLocation2) || PtInRect(&TextRect2, MouseLocation2) || PtInRect(&TextRect3, MouseLocation2) || PtInRect(&TextRect4, MouseLocation2)) {
                 SetCursor(LoadCursorA(0, IDC_SIZEALL));
