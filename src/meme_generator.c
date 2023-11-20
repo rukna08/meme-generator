@@ -321,7 +321,7 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             SetStretchBltMode(DeviceContextHandle, HALFTONE);
             StretchBlt(DeviceContextHandle, ImageRect2.left, ImageRect2.top, ImageRect2.right - ImageRect2.left, ImageRect2.bottom - ImageRect2.top, DeviceContextHandleImage2, 0, 0, ImageHandleInfo2.bmWidth, ImageHandleInfo2.bmHeight, SRCCOPY);
             
-            for(int i = 0; i < image_handle_index - 1; i++) {
+            for(int i = 0; i < image_handle_index; i++) {
                 image_rects[i].right  = image_rects[i].left + DestWidth;
                 image_rects[i].bottom = image_rects[i].top  + ((DestWidth * image_info_handles[i].bmHeight) / image_info_handles[i].bmWidth);
 
