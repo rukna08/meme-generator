@@ -7,20 +7,19 @@
 #define BUTTON_DISPLAYTEXT 69
 #define BUTTON_COPYIMAGE   420
 #define BUTTON_OPENIMAGE   582
- 
+#define IMAGE_RECTS_ARRAY_SIZE 5
 #define DEBUG 0
  
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
-
 void GetScreenShot();
-
-// Returns file path
-char* display_opendialog();
+char* display_opendialog(); // Returns file path
 
 int WindowWidth = 800;
 int WindowHeight = 900;
  
 int FontSize = 50;
+
+int image_handle_index = 0;
  
 int IsLeftClicked = 0;
 int IsInsideTextRect1 = 0;
@@ -30,6 +29,8 @@ int IsInsideTextRect4 = 0;
  
 int IsInsideImageRect1 = 0;
 int IsInsideImageRect2 = 0;
+
+int is_inside_image_rect[IMAGE_RECTS_ARRAY_SIZE];
  
 int MouseXPos;
 int MouseYPos;
@@ -46,7 +47,7 @@ HWND TextField4;
  
 HFONT WindowControlFont;
 HFONT WindowDrawFont;
- 
+
 HBRUSH GreenBrush;
  
 RECT TextRect1;
@@ -59,6 +60,11 @@ RECT ImageRect1TopRight;
  
 RECT ImageRect2;
 RECT ImageRect2TopRight;
+
+
+
+RECT image_rects[IMAGE_RECTS_ARRAY_SIZE];
+RECT image_rects_top_right[IMAGE_RECTS_ARRAY_SIZE];
  
 SIZE SizeOfText1;
 SIZE SizeOfText2;
@@ -72,6 +78,10 @@ BITMAP ImageHandleInfo;
 HDC DeviceContextHandleImage2;
 HBITMAP ImageHandle2;
 BITMAP ImageHandleInfo2;
+
+HDC device_context_image_handles[IMAGE_RECTS_ARRAY_SIZE];
+HBITMAP image_handles[IMAGE_RECTS_ARRAY_SIZE];
+BITMAP image_info_handles[IMAGE_RECTS_ARRAY_SIZE];
  
 COLORREF GreenColor = 0x0000FF00;
 COLORREF BlackColor = 0x00000000;
@@ -130,6 +140,16 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     ImageRect2TopRight.top = 0;
     ImageRect2TopRight.right = 0;
     ImageRect2TopRight.bottom = 0;
+
+    for(int i = 0; i < IMAGE_RECTS_ARRAY_SIZE; i++) {
+        image_rects[i].left = 400;
+        image_rects[i].top  = 50;
+
+        image_rects_top_right[i].left    = 0;
+        image_rects_top_right[i].top     = 0;
+        image_rects_top_right[i].right   = 0;
+        image_rects_top_right[i].bottom  = 0;
+    }
  
     SendMessage(TextField1, WM_SETFONT, (WPARAM)WindowControlFont, 1);
     SendMessage(TextField2, WM_SETFONT, (WPARAM)WindowControlFont, 1);
@@ -151,6 +171,11 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     
     DeviceContextHandleImage2 = CreateCompatibleDC(NULL);
     SelectObject(DeviceContextHandleImage2, ImageHandle2);
+
+    for(int i = 0; i < IMAGE_RECTS_ARRAY_SIZE; i++) {
+        device_context_image_handles[i] = CreateCompatibleDC(0);
+        SelectObject(device_context_image_handles[i], image_handles[i]);
+    }
     
     GreenBrush = CreateSolidBrush(GreenColor);
  
@@ -181,35 +206,24 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             break;
  
         case WM_COMMAND:
-        
             InvalidateRect(WindowHandle, 0, 1);
 
             if(LOWORD(WParam) == BUTTON_OPENIMAGE) {
-
                 char* file_path = display_opendialog();
-
                 for(int i = 0; file_path[i] != '\0'; i++) {
-
-                    // 92 = '\' and 47 = '/'
-
                     if(file_path[i] == 92) {
-
                         file_path[i] = 47;
-                    
                     }
-
                 }
 
-                OutputDebugStringA(file_path);
+                image_handles[image_handle_index] = (HBITMAP)LoadImageA(0, file_path, 0, 0, 0, LR_LOADFROMFILE);
 
-                ImageHandle2 = (HBITMAP)LoadImageA(0, file_path, 0, 0, 0, LR_LOADFROMFILE);
+                GetObject(image_handles[image_handle_index], sizeof(BITMAP), &image_info_handles[image_handle_index]);
+                SelectObject(device_context_image_handles[image_handle_index], image_handles[image_handle_index]);
 
-                GetObject(ImageHandle2, sizeof(BITMAP), &ImageHandleInfo2);
-
-                SelectObject(DeviceContextHandleImage2, ImageHandle2);
-
+                image_handle_index++;
+                
                 UpdateWindow(WindowHandle);
-
             }
  
             if(LOWORD(WParam) == BUTTON_COPYIMAGE) {
@@ -306,7 +320,20 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
  
             SetStretchBltMode(DeviceContextHandle, HALFTONE);
             StretchBlt(DeviceContextHandle, ImageRect2.left, ImageRect2.top, ImageRect2.right - ImageRect2.left, ImageRect2.bottom - ImageRect2.top, DeviceContextHandleImage2, 0, 0, ImageHandleInfo2.bmWidth, ImageHandleInfo2.bmHeight, SRCCOPY);
- 
+            
+            for(int i = 0; i < image_handle_index - 1; i++) {
+                image_rects[i].right  = image_rects[i].left + DestWidth;
+                image_rects[i].bottom = image_rects[i].top  + ((DestWidth * image_info_handles[i].bmHeight) / image_info_handles[i].bmWidth);
+
+                image_rects_top_right[i].left    = image_rects[i].right - 10;
+                image_rects_top_right[i].top     = image_rects[i].top   - 10;
+                image_rects_top_right[i].right   = image_rects[i].right + 10;
+                image_rects_top_right[i].bottom  = image_rects[i].top   + 10;
+
+                SetStretchBltMode(DeviceContextHandle, HALFTONE);
+                StretchBlt(DeviceContextHandle, image_rects[i].left, image_rects[i].top, image_rects[i].right - image_rects[i].left, image_rects[i].bottom - image_rects[i].top, device_context_image_handles[i], 0, 0, image_info_handles[i].bmWidth, image_info_handles[i].bmHeight, SRCCOPY);
+            }
+
             // ------ Final Image export area ------
  
             // north line
@@ -367,6 +394,10 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             IsInsideImageRect1 = PtInRect(&ImageRect1, MouseLocation);
  
             IsInsideImageRect2 = PtInRect(&ImageRect2, MouseLocation);
+
+            for(int i = 0; i < IMAGE_RECTS_ARRAY_SIZE; i++) {
+                is_inside_image_rect[i] = PtInRect(&image_rects[i], MouseLocation);
+            }
             
             break;
  
@@ -379,6 +410,10 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
  
             IsInsideImageRect1 = 0;
             IsInsideImageRect2 = 0;
+
+            for(int i = 0; i < IMAGE_RECTS_ARRAY_SIZE; i++) {
+                is_inside_image_rect[i] = 0;
+            }
  
             break;
  
@@ -472,6 +507,22 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
  
                 MouseXPos = NewMouseXPos;
                 MouseYPos = NewMouseYPos;
+            }
+
+            for(int i = 0; i < IMAGE_RECTS_ARRAY_SIZE; i++) {
+                if(IsLeftClicked && is_inside_image_rect[i]) {
+                    int new_mousex_pos = GET_X_LPARAM(LParam);
+                    int new_mousey_pos = GET_Y_LPARAM(LParam);
+                    RECT updated_rect  = image_rects[i];
+                    
+                    OffsetRect(&image_rects[i], new_mousex_pos - MouseXPos, new_mousey_pos - MouseYPos);
+                    UnionRect(&updated_rect, &updated_rect, &image_rects[i]);
+                    InvalidateRect(WindowHandle, &updated_rect, 1);
+                    InvalidateRect(WindowHandle, &image_rects_top_right[i], 1);
+                    
+                    MouseXPos = new_mousex_pos;
+                    MouseYPos = new_mousey_pos;
+                }
             }
  
             break;
