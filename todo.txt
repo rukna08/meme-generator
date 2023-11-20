@@ -1,7 +1,0 @@
-When image is clicked, a blue outline would be drawn to signify the image being selected.
-
-While image is clicked, if user presses Delete key from keyboard, the image will be deleted from the render.
-
-A button would be rendered called "Open Image" for loading new images from windows file explorer.
-
-New image would be loaded from the selected path.
