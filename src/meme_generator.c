@@ -135,18 +135,6 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     SendMessage(DisplayTextButton, WM_SETFONT, (WPARAM)WindowControlFont, 1);
     SendMessage(CopyImageButton,   WM_SETFONT, (WPARAM)WindowControlFont, 1);
     SendMessage(save_image_button, WM_SETFONT, (WPARAM)WindowControlFont, 1);
- 
-    ImageHandle = (HBITMAP)LoadImageA(0, "../data/sample.bmp", 0, 0, 0, LR_LOADFROMFILE);
-    GetObject(ImageHandle, sizeof(BITMAP), &ImageHandleInfo);
-    
-    DeviceContextHandleImage = CreateCompatibleDC(NULL);
-    SelectObject(DeviceContextHandleImage, ImageHandle);
- 
-    ImageHandle2 = (HBITMAP)LoadImageA(0, "../data/sample2.bmp", 0, 0, 0, LR_LOADFROMFILE);
-    GetObject(ImageHandle2, sizeof(BITMAP), &ImageHandleInfo2);
-    
-    DeviceContextHandleImage2 = CreateCompatibleDC(NULL);
-    SelectObject(DeviceContextHandleImage2, ImageHandle2);
 
     for(int i = 0; i < IMAGE_RECTS_ARRAY_SIZE; i++) {
         device_context_image_handles[i] = CreateCompatibleDC(0);
