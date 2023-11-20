@@ -5,13 +5,13 @@
 #include <stdlib.h>
  
 #define BUTTON_DISPLAYTEXT 69
-#define BUTTON_COPYIMAGE   420
+#define BUTTON_SAVEIMAGE   420
 #define BUTTON_OPENIMAGE   582
 #define IMAGE_RECTS_ARRAY_SIZE 5
 #define DEBUG 0
  
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
-void GetScreenShot();
+void export_image();
 char* display_opendialog(); // Returns file path
 
 int WindowWidth = 800;
@@ -103,8 +103,8 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     TextField4 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 130, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
     
     HWND DisplayTextButton = CreateWindowA("BUTTON", "Display Text", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 170, 100, 30, WindowHandle, (HMENU)BUTTON_DISPLAYTEXT, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
-    HWND CopyImageButton   = CreateWindowA("BUTTON", "Copy Image",   WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 205, 100, 30, WindowHandle, (HMENU)BUTTON_COPYIMAGE, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
-    HWND open_image_button = CreateWindowA("BUTTON", "Open Image",   WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 240, 100, 30, WindowHandle, (HMENU)BUTTON_OPENIMAGE, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
+    HWND CopyImageButton   = CreateWindowA("BUTTON", "Save Image",   WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 205, 100, 30, WindowHandle, (HMENU)BUTTON_SAVEIMAGE, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
+    HWND save_image_button = CreateWindowA("BUTTON", "Open Image",   WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 240, 100, 30, WindowHandle, (HMENU)BUTTON_OPENIMAGE, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
  
     NONCLIENTMETRICSA NonClientMetrics;
     NonClientMetrics.cbSize = sizeof(NonClientMetrics);
@@ -134,7 +134,7 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
  
     SendMessage(DisplayTextButton, WM_SETFONT, (WPARAM)WindowControlFont, 1);
     SendMessage(CopyImageButton,   WM_SETFONT, (WPARAM)WindowControlFont, 1);
-    SendMessage(open_image_button, WM_SETFONT, (WPARAM)WindowControlFont, 1);
+    SendMessage(save_image_button, WM_SETFONT, (WPARAM)WindowControlFont, 1);
  
     ImageHandle = (HBITMAP)LoadImageA(0, "../data/sample.bmp", 0, 0, 0, LR_LOADFROMFILE);
     GetObject(ImageHandle, sizeof(BITMAP), &ImageHandleInfo);
@@ -202,8 +202,9 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
                 UpdateWindow(WindowHandle);
             }
  
-            if(LOWORD(WParam) == BUTTON_COPYIMAGE) {
+            if(LOWORD(WParam) == BUTTON_SAVEIMAGE) {
                 BITMAPINFO OutputImageBitmapInfo = {0};
+
                 OutputImageBitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
  
                 HDC TemporaryDC = GetDC(WindowHandle);
@@ -222,11 +223,9 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
                 BitmapFileHeader.bfSize = OutputImageBitmapInfo.bmiHeader.biSizeImage + sizeof(BITMAPINFO) + sizeof(BITMAPFILEHEADER);
                 BitmapFileHeader.bfOffBits = sizeof(BITMAPINFO) + sizeof(BITMAPFILEHEADER);
  
-                // ------------ Exporting the image --------------
+                export_image();
 
-                GetScreenShot();
-
-                MessageBoxA(0, "Output Image copied!", "Info", MB_OK | MB_ICONINFORMATION);
+                MessageBoxA(0, "Image exported.", "Info", MB_OK | MB_ICONINFORMATION);
             }
  
             if(LOWORD(WParam) == BUTTON_DISPLAYTEXT) {
@@ -533,7 +532,7 @@ BOOL SaveHBITMAPToFile(HBITMAP hBitmap, LPCTSTR lpszFileName)
     return TRUE;
 }
 
-void GetScreenShot() {
+void export_image() {
     int x1, y1, x2, y2, w, h;
 
     x1  = GetSystemMetrics(SM_XVIRTUALSCREEN);
@@ -548,11 +547,6 @@ void GetScreenShot() {
     HBITMAP hBitmap = CreateCompatibleBitmap(hScreen, w, h);
     HGDIOBJ old_obj = SelectObject(hDC, hBitmap);
     BOOL    bRet    = BitBlt(hDC, 0, 0, w, h, hScreen, x1, y1, SRCCOPY);
-
-    OpenClipboard(NULL);
-    EmptyClipboard();
-    SetClipboardData(CF_BITMAP, hBitmap);
-    CloseClipboard();
 
     SaveHBITMAPToFile(hBitmap, "output.bmp");
 
