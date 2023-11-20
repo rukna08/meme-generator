@@ -13,6 +13,8 @@
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 
 void GetScreenShot();
+
+// Returns file path
 char* display_opendialog();
 
 int WindowWidth = 800;
@@ -179,12 +181,34 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
             break;
  
         case WM_COMMAND:
+        
             InvalidateRect(WindowHandle, 0, 1);
 
             if(LOWORD(WParam) == BUTTON_OPENIMAGE) {
 
                 char* file_path = display_opendialog();
+
+                for(int i = 0; file_path[i] != '\0'; i++) {
+
+                    // 92 = '\' and 47 = '/'
+
+                    if(file_path[i] == 92) {
+
+                        file_path[i] = 47;
+                    
+                    }
+
+                }
+
                 OutputDebugStringA(file_path);
+
+                ImageHandle2 = (HBITMAP)LoadImageA(0, file_path, 0, 0, 0, LR_LOADFROMFILE);
+
+                GetObject(ImageHandle2, sizeof(BITMAP), &ImageHandleInfo2);
+
+                SelectObject(DeviceContextHandleImage2, ImageHandle2);
+
+                UpdateWindow(WindowHandle);
 
             }
  
@@ -604,5 +628,12 @@ char* display_opendialog() {
 
     GetOpenFileNameA(&ofn);
 
-    return ofn.lpstrFile;
+    // COPIED FROM CHATGPT
+
+    char* result = 0;
+
+    result = (char*)malloc(strlen(szFile) + 1);
+    strcpy(result, szFile);
+
+    return result;
 }
