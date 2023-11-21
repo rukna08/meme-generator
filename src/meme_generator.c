@@ -14,7 +14,7 @@
  
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 void export_image();
-char* display_opendialog(); // Returns file path
+char* display_opendialog();
 
 char* file_path = 0;
 
@@ -100,7 +100,7 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     
     RegisterClassExA(&WindowClass);
     
-    WindowHandle = CreateWindowExA(WS_EX_CLIENTEDGE | WS_EX_COMPOSITED, WindowClass.lpszClassName, "Meme Generator", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, WindowWidth, WindowHeight, 0, 0, Instance, 0);
+    WindowHandle = CreateWindowExA(WS_EX_CLIENTEDGE | WS_EX_COMPOSITED, WindowClass.lpszClassName, "Meme Generator", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, WindowWidth, WindowHeight, 0, 0, Instance, 0);
  
     TextField1 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 10, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
     TextField2 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 50, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
@@ -187,10 +187,6 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
                     end_index--;
                 }
 
-                char buffer[33];
-                itoa(end_index, buffer, 10);
-                OutputDebugStringA(buffer);
-
                 char export_path[MAX_PATH];
                 for(int i = 0; i <= end_index + 1; i++) {
                     if(i == end_index + 1) {
@@ -199,8 +195,7 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
                         export_path[i] = file_path[i];
                     }
                 }
-                OutputDebugStringA(export_path);
-                printf("%s", export_path);
+
                 ShellExecuteA(WindowHandle, "open", export_path, 0, 0, SW_SHOWDEFAULT);
             }
 
