@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+// Constants
  
 #define BUTTON_DISPLAYTEXT        69
 #define BUTTON_SAVEIMAGE          420
@@ -12,78 +14,65 @@
 #define IMAGE_RECTS_ARRAY_SIZE    5
 #define DEBUG                     0
  
+// Functions
+
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
-void export_image();
-char* display_opendialog();
+void             export_image();
+char*            display_opendialog();
 
-char* file_path = 0;
+// Global Variables
 
-int WindowWidth = 800;
-int WindowHeight = 900;
- 
-int FontSize = 50;
-
-int image_handle_index = 0;
- 
-int IsLeftClicked = 0;
-int IsInsideTextRect1 = 0;
-int IsInsideTextRect2 = 0;
-int IsInsideTextRect3 = 0;
-int IsInsideTextRect4 = 0;
- 
-int IsInsideImageRect1 = 0;
-int IsInsideImageRect2 = 0;
-
-int is_inside_image_rect[IMAGE_RECTS_ARRAY_SIZE];
- 
-int MouseXPos;
-int MouseYPos;
- 
-char ToBeDisplayedText1[100];
-char ToBeDisplayedText2[100];
-char ToBeDisplayedText3[100];
-char ToBeDisplayedText4[100];
- 
-HWND TextField1;
-HWND TextField2;
-HWND TextField3;
-HWND TextField4;
- 
-HFONT WindowControlFont;
-HFONT WindowDrawFont;
-
-HBRUSH GreenBrush;
- 
-RECT TextRect1;
-RECT TextRect2;
-RECT TextRect3;
-RECT TextRect4;
-
-RECT image_rects[IMAGE_RECTS_ARRAY_SIZE];
-RECT image_rects_top_right[IMAGE_RECTS_ARRAY_SIZE];
- 
-SIZE SizeOfText1;
-SIZE SizeOfText2;
-SIZE SizeOfText3;
-SIZE SizeOfText4;
- 
-HDC DeviceContextHandleImage;
-HBITMAP ImageHandle;
-BITMAP ImageHandleInfo;
- 
-HDC DeviceContextHandleImage2;
-HBITMAP ImageHandle2;
-BITMAP ImageHandleInfo2;
-
-HDC device_context_image_handles[IMAGE_RECTS_ARRAY_SIZE];
-HBITMAP image_handles[IMAGE_RECTS_ARRAY_SIZE];
-BITMAP image_info_handles[IMAGE_RECTS_ARRAY_SIZE];
- 
-COLORREF GreenColor = 0x0000FF00;
-COLORREF BlackColor = 0x00000000;
-
-HWND WindowHandle;
+char*     file_path = 0;
+int       WindowWidth = 800;
+int       WindowHeight = 900;
+int       FontSize = 50;
+int       image_handle_index = 0;
+int       IsLeftClicked = 0;
+int       IsInsideTextRect1 = 0;
+int       IsInsideTextRect2 = 0;
+int       IsInsideTextRect3 = 0;
+int       IsInsideTextRect4 = 0;
+int       IsInsideImageRect1 = 0;
+int       IsInsideImageRect2 = 0;
+int       is_inside_image_rect[IMAGE_RECTS_ARRAY_SIZE];
+int       MouseXPos;
+int       MouseYPos;
+char      ToBeDisplayedText1[100];
+char      ToBeDisplayedText2[100];
+char      ToBeDisplayedText3[100];
+char      ToBeDisplayedText4[100];
+HWND      TextField1;
+HWND      TextField2;
+HWND      TextField3;
+HWND      TextField4;
+HFONT     WindowControlFont;
+HFONT     WindowDrawFont;
+HBRUSH    GreenBrush;
+RECT      TextRect1;
+RECT      TextRect2;
+RECT      TextRect3;
+RECT      TextRect4;
+RECT      image_rects[IMAGE_RECTS_ARRAY_SIZE];
+RECT      image_rects_top_right[IMAGE_RECTS_ARRAY_SIZE];
+SIZE      SizeOfText1;
+SIZE      SizeOfText2;
+SIZE      SizeOfText3;
+SIZE      SizeOfText4;
+HDC       DeviceContextHandleImage;
+HBITMAP   ImageHandle;
+BITMAP    ImageHandleInfo;
+HDC       DeviceContextHandleImage2;
+HBITMAP   ImageHandle2;
+BITMAP    ImageHandleInfo2;
+HDC       device_context_image_handles[IMAGE_RECTS_ARRAY_SIZE];
+HBITMAP   image_handles[IMAGE_RECTS_ARRAY_SIZE];
+BITMAP    image_info_handles[IMAGE_RECTS_ARRAY_SIZE];
+COLORREF  GreenColor = 0x0000FF00;
+COLORREF  BlackColor = 0x00000000;
+HWND      WindowHandle;
 HINSTANCE instance_handle;
+
+// Entry Point
  
 int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, int CommandShow) {
 
@@ -102,14 +91,14 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     
     WindowHandle = CreateWindowExA(WS_EX_CLIENTEDGE | WS_EX_COMPOSITED, WindowClass.lpszClassName, "Meme Generator", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, WindowWidth, WindowHeight, 0, 0, Instance, 0);
  
-    TextField1 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 10, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
-    TextField2 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 50, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
-    TextField3 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 90, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
+    TextField1 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 10,  300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
+    TextField2 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 50,  300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
+    TextField3 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 90,  300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
     TextField4 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 130, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
     
-    HWND DisplayTextButton =    CreateWindowA("BUTTON", "Display Text",     WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 170, 100, 30, WindowHandle, (HMENU)BUTTON_DISPLAYTEXT,  (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
-    HWND CopyImageButton   =    CreateWindowA("BUTTON", "Save Image",       WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 205, 100, 30, WindowHandle, (HMENU)BUTTON_SAVEIMAGE,    (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
-    HWND save_image_button =    CreateWindowA("BUTTON", "Open Image",       WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 240, 100, 30, WindowHandle, (HMENU)BUTTON_OPENIMAGE,    (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
+    HWND DisplayTextButton =    CreateWindowA("BUTTON", "Display Text",     WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10,  170, 100, 30, WindowHandle, (HMENU)BUTTON_DISPLAYTEXT,  (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
+    HWND CopyImageButton   =    CreateWindowA("BUTTON", "Save Image",       WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10,  205, 100, 30, WindowHandle, (HMENU)BUTTON_SAVEIMAGE,    (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
+    HWND save_image_button =    CreateWindowA("BUTTON", "Open Image",       WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10,  240, 100, 30, WindowHandle, (HMENU)BUTTON_OPENIMAGE,    (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
     HWND export_folder_button = CreateWindowA("BUTTON", "Export Folder",    WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 120, 170, 100, 30, WindowHandle, (HMENU)BUTTON_EXPORTFOLDER, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0); 
 
     NONCLIENTMETRICSA NonClientMetrics;
@@ -459,14 +448,7 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
     return 0;
 }
 
-///
-///
-///
-/// COPIED CODE FROM STACK OVERFLOW
-///
-///
-///
-BOOL SaveHBITMAPToFile(HBITMAP hBitmap, LPCTSTR lpszFileName)
+BOOL save_hbitmap_to_file(HBITMAP hBitmap, LPCTSTR lpszFileName)
 {
     HDC hDC;
     int iBits;
@@ -539,50 +521,45 @@ BOOL SaveHBITMAPToFile(HBITMAP hBitmap, LPCTSTR lpszFileName)
     bmfHdr.bfOffBits = (DWORD)sizeof(BITMAPFILEHEADER) + (DWORD)sizeof(BITMAPINFOHEADER) + dwPaletteSize;
 
     WriteFile(fh, (LPSTR)&bmfHdr, sizeof(BITMAPFILEHEADER), &dwWritten, NULL);
-
     WriteFile(fh, (LPSTR)lpbi, dwDIBSize, &dwWritten, NULL);
     GlobalUnlock(hDib);
     GlobalFree(hDib);
     CloseHandle(fh);
+    
     return TRUE;
+
 }
 
 void export_image() {
-    int x1, y1, x2, y2, w, h;
 
-    x1  = GetSystemMetrics(SM_XVIRTUALSCREEN);
-    y1  = GetSystemMetrics(SM_YVIRTUALSCREEN) + 280;
-    x2  = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-    y2  = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-    w   = x2 - x1 - 1140;
-    h   = y2 - y1 - 225;
+    int     x1               = GetSystemMetrics(SM_XVIRTUALSCREEN);
+    int     y1               = GetSystemMetrics(SM_YVIRTUALSCREEN) + 280;
+    int     x2               = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+    int     y2               = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+    int     w                = x2 - x1 - 1140;
+    int     h                = y2 - y1 - 225;
+    HDC     hScreen          = GetDC(WindowHandle);
+    HDC     hDC              = CreateCompatibleDC(hScreen);
+    HBITMAP hBitmap          = CreateCompatibleBitmap(hScreen, w, h);
+    HGDIOBJ old_obj          = SelectObject(hDC, hBitmap);
+    BOOL    bRet             = BitBlt(hDC, 0, 0, w, h, hScreen, x1, y1, SRCCOPY);
 
-    HDC     hScreen = GetDC(WindowHandle);
-    HDC     hDC     = CreateCompatibleDC(hScreen);
-    HBITMAP hBitmap = CreateCompatibleBitmap(hScreen, w, h);
-    HGDIOBJ old_obj = SelectObject(hDC, hBitmap);
-    BOOL    bRet    = BitBlt(hDC, 0, 0, w, h, hScreen, x1, y1, SRCCOPY);
-
-    SaveHBITMAPToFile(hBitmap, "output.bmp");
+    save_hbitmap_to_file(hBitmap, "output.bmp");
 
     SelectObject(hDC, old_obj);
     DeleteDC(hDC);
     ReleaseDC(NULL, hScreen);
     DeleteObject(hBitmap);
+
 }
 
 char* display_opendialog() {
 
-    /// FILE OPEN DIALOG BOX ///
-
     OPENFILENAME ofn;
-    char szFile[260];
-    HWND hwnd = WindowHandle;
-    
-    // handle to the file idk
-    HANDLE hf;
+    char         szFile[260];
+    HWND         hwnd = WindowHandle;
+    HANDLE       hf;
 
-    // similar to ofn = {0};
     ZeroMemory(&ofn, sizeof(ofn));
 
     ofn.lStructSize             = sizeof(ofn);
@@ -599,12 +576,9 @@ char* display_opendialog() {
 
     GetOpenFileNameA(&ofn);
 
-    // COPIED FROM CHATGPT
-
     char* result = 0;
-
     result = (char*)malloc(strlen(szFile) + 1);
     strcpy(result, szFile);
-
     return result;
+
 }
