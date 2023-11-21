@@ -1,18 +1,22 @@
 #include <windows.h>
 #include <windowsx.h>
+#include <shellapi.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
  
-#define BUTTON_DISPLAYTEXT 69
-#define BUTTON_SAVEIMAGE   420
-#define BUTTON_OPENIMAGE   582
-#define IMAGE_RECTS_ARRAY_SIZE 5
-#define DEBUG 0
+#define BUTTON_DISPLAYTEXT        69
+#define BUTTON_SAVEIMAGE          420
+#define BUTTON_OPENIMAGE          582
+#define BUTTON_EXPORTFOLDER       555
+#define IMAGE_RECTS_ARRAY_SIZE    5
+#define DEBUG                     0
  
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 void export_image();
 char* display_opendialog(); // Returns file path
+
+char* file_path = 0;
 
 int WindowWidth = 800;
 int WindowHeight = 900;
@@ -82,16 +86,17 @@ HWND WindowHandle;
 HINSTANCE instance_handle;
  
 int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, int CommandShow) {
+
     WNDCLASSEXA WindowClass = {0};
  
-    WindowClass.cbSize = sizeof(WNDCLASSEXA);
-    WindowClass.lpfnWndProc = WindowProc;
-    WindowClass.hInstance = Instance;
-    WindowClass.hIcon = LoadIconA(0, IDI_APPLICATION);
-    WindowClass.hCursor = LoadCursorA(0, IDC_ARROW);
-    WindowClass.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
-    WindowClass.lpszClassName = "MainWindowClass";
-    WindowClass.hIconSm = LoadIconA(0, IDI_APPLICATION);
+    WindowClass.cbSize =            sizeof(WNDCLASSEXA);
+    WindowClass.lpfnWndProc =       WindowProc;
+    WindowClass.hInstance =         Instance;
+    WindowClass.hIcon =             LoadIconA(0, IDI_APPLICATION);
+    WindowClass.hCursor =           LoadCursorA(0, IDC_ARROW);
+    WindowClass.hbrBackground =     (HBRUSH)(COLOR_WINDOW+1);
+    WindowClass.lpszClassName =     "MainWindowClass";
+    WindowClass.hIconSm =           LoadIconA(0, IDI_APPLICATION);
     
     RegisterClassExA(&WindowClass);
     
@@ -102,10 +107,11 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     TextField3 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 90, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
     TextField4 = CreateWindowA("EDIT", 0, WS_CHILD | WS_VISIBLE | WS_BORDER, 10, 130, 300, 30, WindowHandle, 0, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
     
-    HWND DisplayTextButton = CreateWindowA("BUTTON", "Display Text", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 170, 100, 30, WindowHandle, (HMENU)BUTTON_DISPLAYTEXT, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
-    HWND CopyImageButton   = CreateWindowA("BUTTON", "Save Image",   WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 205, 100, 30, WindowHandle, (HMENU)BUTTON_SAVEIMAGE, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
-    HWND save_image_button = CreateWindowA("BUTTON", "Open Image",   WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 240, 100, 30, WindowHandle, (HMENU)BUTTON_OPENIMAGE, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
- 
+    HWND DisplayTextButton =    CreateWindowA("BUTTON", "Display Text",     WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 170, 100, 30, WindowHandle, (HMENU)BUTTON_DISPLAYTEXT,  (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
+    HWND CopyImageButton   =    CreateWindowA("BUTTON", "Save Image",       WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 205, 100, 30, WindowHandle, (HMENU)BUTTON_SAVEIMAGE,    (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
+    HWND save_image_button =    CreateWindowA("BUTTON", "Open Image",       WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 240, 100, 30, WindowHandle, (HMENU)BUTTON_OPENIMAGE,    (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0);
+    HWND export_folder_button = CreateWindowA("BUTTON", "Export Folder",    WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 120, 170, 100, 30, WindowHandle, (HMENU)BUTTON_EXPORTFOLDER, (HINSTANCE)GetWindowLongPtrA(WindowHandle, GWLP_HINSTANCE), 0); 
+
     NONCLIENTMETRICSA NonClientMetrics;
     NonClientMetrics.cbSize = sizeof(NonClientMetrics);
     
@@ -132,9 +138,10 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
     SendMessage(TextField3, WM_SETFONT, (WPARAM)WindowControlFont, 1);
     SendMessage(TextField4, WM_SETFONT, (WPARAM)WindowControlFont, 1);
  
-    SendMessage(DisplayTextButton, WM_SETFONT, (WPARAM)WindowControlFont, 1);
-    SendMessage(CopyImageButton,   WM_SETFONT, (WPARAM)WindowControlFont, 1);
-    SendMessage(save_image_button, WM_SETFONT, (WPARAM)WindowControlFont, 1);
+    SendMessage(DisplayTextButton,    WM_SETFONT, (WPARAM)WindowControlFont, 1);
+    SendMessage(CopyImageButton,      WM_SETFONT, (WPARAM)WindowControlFont, 1);
+    SendMessage(save_image_button,    WM_SETFONT, (WPARAM)WindowControlFont, 1);
+    SendMessage(export_folder_button, WM_SETFONT, (WPARAM)WindowControlFont, 1);
 
     for(int i = 0; i < IMAGE_RECTS_ARRAY_SIZE; i++) {
         device_context_image_handles[i] = CreateCompatibleDC(0);
@@ -157,7 +164,7 @@ int WinMain(HINSTANCE Instance, HINSTANCE PreviousInstance, LPSTR CommandLine, i
  
     return 0;
 }
- 
+
 LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam) {
     
     switch(Message) {
@@ -172,8 +179,33 @@ LRESULT CALLBACK WindowProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPAR
         case WM_COMMAND:
             InvalidateRect(WindowHandle, 0, 1);
 
+            if(LOWORD(WParam) == BUTTON_EXPORTFOLDER) {
+                
+                int end_index = strlen(file_path) - 1;
+                while(1) {
+                    if(file_path[end_index] == 47) break;
+                    end_index--;
+                }
+
+                char buffer[33];
+                itoa(end_index, buffer, 10);
+                OutputDebugStringA(buffer);
+
+                char export_path[MAX_PATH];
+                for(int i = 0; i <= end_index + 1; i++) {
+                    if(i == end_index + 1) {
+                        export_path[i] = '\0';
+                    } else {
+                        export_path[i] = file_path[i];
+                    }
+                }
+                OutputDebugStringA(export_path);
+                printf("%s", export_path);
+                ShellExecuteA(WindowHandle, "open", export_path, 0, 0, SW_SHOWDEFAULT);
+            }
+
             if(LOWORD(WParam) == BUTTON_OPENIMAGE) {
-                char* file_path = display_opendialog();
+                file_path = display_opendialog();
                 for(int i = 0; file_path[i] != '\0'; i++) {
                     if(file_path[i] == 92) {
                         file_path[i] = 47;
